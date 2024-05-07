@@ -3,12 +3,12 @@
 #   * Rearrange models' order
 #   * Make sure each model has one field with primary_key=True
 #   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
-#   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
+from lnschema_core.models import Registry
 
 
-class CareSite(models.Model):
+class CareSite(Registry):
     care_site_id = models.IntegerField(primary_key=True)
     care_site_name = models.CharField(max_length=255, blank=True, null=True)
     place_of_service_concept = models.ForeignKey(
@@ -21,11 +21,11 @@ class CareSite(models.Model):
     )
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "care_site"
 
 
-class CdmSource(models.Model):
+class CdmSource(Registry):
     cdm_source_name = models.CharField(max_length=255)
     cdm_source_abbreviation = models.CharField(max_length=25)
     cdm_holder = models.CharField(max_length=255)
@@ -41,22 +41,22 @@ class CdmSource(models.Model):
     vocabulary_version = models.CharField(max_length=20)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "cdm_source"
 
 
-class Cohort(models.Model):
+class Cohort(Registry):
     cohort_definition_id = models.IntegerField()
     subject_id = models.IntegerField()
     cohort_start_date = models.DateField()
     cohort_end_date = models.DateField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "cohort"
 
 
-class CohortDefinition(models.Model):
+class CohortDefinition(Registry):
     cohort_definition_id = models.IntegerField()
     cohort_definition_name = models.CharField(max_length=255)
     cohort_definition_description = models.TextField(blank=True, null=True)
@@ -70,11 +70,11 @@ class CohortDefinition(models.Model):
     cohort_initiation_date = models.DateField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "cohort_definition"
 
 
-class Concept(models.Model):
+class Concept(Registry):
     concept_id = models.IntegerField(primary_key=True)
     concept_name = models.CharField(max_length=255)
     domain = models.ForeignKey("Domain", models.DO_NOTHING)
@@ -87,11 +87,11 @@ class Concept(models.Model):
     invalid_reason = models.CharField(max_length=1, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "concept"
 
 
-class ConceptAncestor(models.Model):
+class ConceptAncestor(Registry):
     ancestor_concept = models.ForeignKey(Concept, models.DO_NOTHING)
     descendant_concept = models.ForeignKey(
         Concept,
@@ -102,21 +102,21 @@ class ConceptAncestor(models.Model):
     max_levels_of_separation = models.IntegerField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "concept_ancestor"
 
 
-class ConceptClass(models.Model):
+class ConceptClass(Registry):
     concept_class_id = models.CharField(primary_key=True, max_length=20)
     concept_class_name = models.CharField(max_length=255)
     concept_class_concept = models.ForeignKey(Concept, models.DO_NOTHING)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "concept_class"
 
 
-class ConceptRelationship(models.Model):
+class ConceptRelationship(Registry):
     concept_id_1 = models.ForeignKey(
         Concept, models.DO_NOTHING, db_column="concept_id_1"
     )
@@ -132,11 +132,11 @@ class ConceptRelationship(models.Model):
     invalid_reason = models.CharField(max_length=1, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "concept_relationship"
 
 
-class ConceptSynonym(models.Model):
+class ConceptSynonym(Registry):
     concept = models.ForeignKey(Concept, models.DO_NOTHING)
     concept_synonym_name = models.CharField(max_length=1000)
     language_concept = models.ForeignKey(
@@ -144,11 +144,11 @@ class ConceptSynonym(models.Model):
     )
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "concept_synonym"
 
 
-class ConditionEra(models.Model):
+class ConditionEra(Registry):
     condition_era_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey("Person", models.DO_NOTHING)
     condition_concept = models.ForeignKey(Concept, models.DO_NOTHING)
@@ -157,11 +157,11 @@ class ConditionEra(models.Model):
     condition_occurrence_count = models.IntegerField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "condition_era"
 
 
-class ConditionOccurrence(models.Model):
+class ConditionOccurrence(Registry):
     condition_occurrence_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey("Person", models.DO_NOTHING)
     condition_concept = models.ForeignKey(Concept, models.DO_NOTHING)
@@ -202,11 +202,11 @@ class ConditionOccurrence(models.Model):
     )
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "condition_occurrence"
 
 
-class Cost(models.Model):
+class Cost(Registry):
     cost_id = models.IntegerField(primary_key=True)
     cost_event_id = models.IntegerField()
     cost_domain = models.ForeignKey("Domain", models.DO_NOTHING)
@@ -273,11 +273,11 @@ class Cost(models.Model):
     drg_source_value = models.CharField(max_length=3, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "cost"
 
 
-class Death(models.Model):
+class Death(Registry):
     person = models.ForeignKey("Person", models.DO_NOTHING)
     death_date = models.DateField()
     death_datetime = models.DateTimeField(blank=True, null=True)
@@ -301,11 +301,11 @@ class Death(models.Model):
     )
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "death"
 
 
-class DeviceExposure(models.Model):
+class DeviceExposure(Registry):
     device_exposure_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey("Person", models.DO_NOTHING)
     device_concept = models.ForeignKey(Concept, models.DO_NOTHING)
@@ -353,21 +353,21 @@ class DeviceExposure(models.Model):
     )
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "device_exposure"
 
 
-class Domain(models.Model):
+class Domain(Registry):
     domain_id = models.CharField(primary_key=True, max_length=20)
     domain_name = models.CharField(max_length=255)
     domain_concept = models.ForeignKey(Concept, models.DO_NOTHING)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "domain"
 
 
-class DoseEra(models.Model):
+class DoseEra(Registry):
     dose_era_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey("Person", models.DO_NOTHING)
     drug_concept = models.ForeignKey(Concept, models.DO_NOTHING)
@@ -379,11 +379,11 @@ class DoseEra(models.Model):
     dose_era_end_date = models.DateField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "dose_era"
 
 
-class DrugEra(models.Model):
+class DrugEra(Registry):
     drug_era_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey("Person", models.DO_NOTHING)
     drug_concept = models.ForeignKey(Concept, models.DO_NOTHING)
@@ -393,11 +393,11 @@ class DrugEra(models.Model):
     gap_days = models.IntegerField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "drug_era"
 
 
-class DrugExposure(models.Model):
+class DrugExposure(Registry):
     drug_exposure_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey("Person", models.DO_NOTHING)
     drug_concept = models.ForeignKey(Concept, models.DO_NOTHING)
@@ -443,11 +443,11 @@ class DrugExposure(models.Model):
     dose_unit_source_value = models.CharField(max_length=50, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "drug_exposure"
 
 
-class DrugStrength(models.Model):
+class DrugStrength(Registry):
     drug_concept = models.ForeignKey(Concept, models.DO_NOTHING)
     ingredient_concept = models.ForeignKey(
         Concept, models.DO_NOTHING, related_name="drugstrength_ingredient_concept_set"
@@ -488,11 +488,11 @@ class DrugStrength(models.Model):
     invalid_reason = models.CharField(max_length=1, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "drug_strength"
 
 
-class Episode(models.Model):
+class Episode(Registry):
     episode_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey("Person", models.DO_NOTHING)
     episode_concept = models.ForeignKey(Concept, models.DO_NOTHING)
@@ -518,21 +518,21 @@ class Episode(models.Model):
     )
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "episode"
 
 
-class EpisodeEvent(models.Model):
+class EpisodeEvent(Registry):
     episode = models.ForeignKey(Episode, models.DO_NOTHING)
     event_id = models.IntegerField()
     episode_event_field_concept = models.ForeignKey(Concept, models.DO_NOTHING)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "episode_event"
 
 
-class FactRelationship(models.Model):
+class FactRelationship(Registry):
     domain_concept_id_1 = models.ForeignKey(
         Concept, models.DO_NOTHING, db_column="domain_concept_id_1"
     )
@@ -551,11 +551,11 @@ class FactRelationship(models.Model):
     )
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "fact_relationship"
 
 
-class Location(models.Model):
+class Location(Registry):
     location_id = models.IntegerField(primary_key=True)
     address_1 = models.CharField(max_length=50, blank=True, null=True)
     address_2 = models.CharField(max_length=50, blank=True, null=True)
@@ -576,11 +576,11 @@ class Location(models.Model):
     )
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "location"
 
 
-class Measurement(models.Model):
+class Measurement(Registry):
     measurement_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey("Person", models.DO_NOTHING)
     measurement_concept = models.ForeignKey(Concept, models.DO_NOTHING)
@@ -656,11 +656,11 @@ class Measurement(models.Model):
     )
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "measurement"
 
 
-class Metadata(models.Model):
+class Metadata(Registry):
     metadata_id = models.IntegerField(primary_key=True)
     metadata_concept = models.ForeignKey(Concept, models.DO_NOTHING)
     metadata_type_concept = models.ForeignKey(
@@ -682,11 +682,11 @@ class Metadata(models.Model):
     metadata_datetime = models.DateTimeField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "metadata"
 
 
-class Note(models.Model):
+class Note(Registry):
     note_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey("Person", models.DO_NOTHING)
     note_date = models.DateField()
@@ -721,11 +721,11 @@ class Note(models.Model):
     )
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "note"
 
 
-class NoteNlp(models.Model):
+class NoteNlp(Registry):
     note_nlp_id = models.IntegerField(primary_key=True)
     note_id = models.IntegerField()
     section_concept = models.ForeignKey(
@@ -756,11 +756,11 @@ class NoteNlp(models.Model):
     term_modifiers = models.CharField(max_length=2000, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "note_nlp"
 
 
-class Observation(models.Model):
+class Observation(Registry):
     observation_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey("Person", models.DO_NOTHING)
     observation_concept = models.ForeignKey(Concept, models.DO_NOTHING)
@@ -824,11 +824,11 @@ class Observation(models.Model):
     )
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "observation"
 
 
-class ObservationPeriod(models.Model):
+class ObservationPeriod(Registry):
     observation_period_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey("Person", models.DO_NOTHING)
     observation_period_start_date = models.DateField()
@@ -836,11 +836,11 @@ class ObservationPeriod(models.Model):
     period_type_concept = models.ForeignKey(Concept, models.DO_NOTHING)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "observation_period"
 
 
-class PayerPlanPeriod(models.Model):
+class PayerPlanPeriod(Registry):
     payer_plan_period_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey("Person", models.DO_NOTHING)
     payer_plan_period_start_date = models.DateField()
@@ -902,11 +902,11 @@ class PayerPlanPeriod(models.Model):
     )
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "payer_plan_period"
 
 
-class Person(models.Model):
+class Person(Registry):
     person_id = models.IntegerField(primary_key=True)
     gender_concept = models.ForeignKey(Concept, models.DO_NOTHING)
     year_of_birth = models.IntegerField()
@@ -949,11 +949,11 @@ class Person(models.Model):
     )
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "person"
 
 
-class ProcedureOccurrence(models.Model):
+class ProcedureOccurrence(Registry):
     procedure_occurrence_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey(Person, models.DO_NOTHING)
     procedure_concept = models.ForeignKey(Concept, models.DO_NOTHING)
@@ -992,11 +992,11 @@ class ProcedureOccurrence(models.Model):
     modifier_source_value = models.CharField(max_length=50, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "procedure_occurrence"
 
 
-class Provider(models.Model):
+class Provider(Registry):
     provider_id = models.IntegerField(primary_key=True)
     provider_name = models.CharField(max_length=255, blank=True, null=True)
     npi = models.CharField(max_length=20, blank=True, null=True)
@@ -1032,11 +1032,11 @@ class Provider(models.Model):
     )
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "provider"
 
 
-class Relationship(models.Model):
+class Relationship(Registry):
     relationship_id = models.CharField(primary_key=True, max_length=20)
     relationship_name = models.CharField(max_length=255)
     is_hierarchical = models.CharField(max_length=1)
@@ -1045,11 +1045,11 @@ class Relationship(models.Model):
     relationship_concept = models.ForeignKey(Concept, models.DO_NOTHING)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "relationship"
 
 
-class SourceToConceptMap(models.Model):
+class SourceToConceptMap(Registry):
     source_code = models.CharField(max_length=50)
     source_concept = models.ForeignKey(Concept, models.DO_NOTHING)
     source_vocabulary_id = models.CharField(max_length=20)
@@ -1063,11 +1063,11 @@ class SourceToConceptMap(models.Model):
     invalid_reason = models.CharField(max_length=1, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "source_to_concept_map"
 
 
-class Specimen(models.Model):
+class Specimen(Registry):
     specimen_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey(Person, models.DO_NOTHING)
     specimen_concept = models.ForeignKey(Concept, models.DO_NOTHING)
@@ -1107,11 +1107,11 @@ class Specimen(models.Model):
     disease_status_source_value = models.CharField(max_length=50, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "specimen"
 
 
-class VisitDetail(models.Model):
+class VisitDetail(Registry):
     visit_detail_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey(Person, models.DO_NOTHING)
     visit_detail_concept = models.ForeignKey(Concept, models.DO_NOTHING)
@@ -1163,11 +1163,11 @@ class VisitDetail(models.Model):
     visit_occurrence = models.ForeignKey("VisitOccurrence", models.DO_NOTHING)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "visit_detail"
 
 
-class VisitOccurrence(models.Model):
+class VisitOccurrence(Registry):
     visit_occurrence_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey(Person, models.DO_NOTHING)
     visit_concept = models.ForeignKey(Concept, models.DO_NOTHING)
@@ -1211,11 +1211,11 @@ class VisitOccurrence(models.Model):
     )
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "visit_occurrence"
 
 
-class Vocabulary(models.Model):
+class Vocabulary(Registry):
     vocabulary_id = models.CharField(primary_key=True, max_length=20)
     vocabulary_name = models.CharField(max_length=255)
     vocabulary_reference = models.CharField(max_length=255, blank=True, null=True)
@@ -1223,5 +1223,5 @@ class Vocabulary(models.Model):
     vocabulary_concept = models.ForeignKey(Concept, models.DO_NOTHING)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "vocabulary"
