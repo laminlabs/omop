@@ -9,6 +9,8 @@ from lnschema_core.models import Registry
 
 
 class CareSite(Registry):
+    """The CARE_SITE table contains a list of uniquely identified institutional (physical or organizational) units where healthcare delivery is practiced (offices, wards, hospitals, clinics, etc.)."""
+
     care_site_id = models.IntegerField(primary_key=True)
     care_site_name = models.CharField(max_length=255, blank=True, null=True)
     place_of_service_concept = models.ForeignKey(
@@ -26,6 +28,8 @@ class CareSite(Registry):
 
 
 class CdmSource(Registry):
+    """The CDM_SOURCE table contains detail about the source database and the process used to transform the data into the OMOP Common Data Model."""
+
     cdm_source_name = models.CharField(max_length=255)
     cdm_source_abbreviation = models.CharField(max_length=25)
     cdm_holder = models.CharField(max_length=255)
@@ -46,6 +50,13 @@ class CdmSource(Registry):
 
 
 class Cohort(Registry):
+    """The COHORT table contains records of subjects that satisfy a given set of criteria for a duration of time.
+
+    The definition of the cohort is contained within the COHORT_DEFINITION table.
+    It is listed as part of the RESULTS schema because it is a table that users of the database as well as tools such as ATLAS need to be able to write to.
+    The CDM and Vocabulary tables are all read-only so it is suggested that the COHORT and COHORT_DEFINTION tables are kept in a separate schema to alleviate confusion.
+    """
+
     cohort_definition_id = models.IntegerField()
     subject_id = models.IntegerField()
     cohort_start_date = models.DateField()
@@ -57,6 +68,11 @@ class Cohort(Registry):
 
 
 class CohortDefinition(Registry):
+    """The COHORT_DEFINITION table contains records defining a Cohort derived from the data through the associated description and syntax and upon instantiation (execution of the algorithm) placed into the COHORT table.
+
+    Cohorts are a set of subjects that satisfy a given combination of inclusion criteria for a duration of time. The COHORT_DEFINITION table provides a standardized structure for maintaining the rules governing the inclusion of a subject into a cohort, and can store operational programming code to instantiate the cohort within the OMOP Common Data Model.
+    """
+
     cohort_definition_id = models.IntegerField()
     cohort_definition_name = models.CharField(max_length=255)
     cohort_definition_description = models.TextField(blank=True, null=True)
@@ -75,6 +91,13 @@ class CohortDefinition(Registry):
 
 
 class Concept(Registry):
+    """The Standardized Vocabularies contains records, or Concepts, that uniquely identify each fundamental unit of meaning used to express clinical information in all domain tables of the CDM.
+
+    Concepts are derived from vocabularies, which represent clinical information across a domain (e.g. conditions, drugs, procedures) through the use of codes and associated descriptions. Some Concepts are designated Standard Concepts, meaning these Concepts can be used as normative expressions of a clinical entity within the OMOP Common Data Model and within standardized analytics. Each Standard Concept belongs to one domain, which defines the location where the Concept would be expected to occur within data tables of the CDM.
+    Concepts can represent broad categories (like �Cardiovascular disease�), detailed clinical elements (�Myocardial infarction of the anterolateral wall�) or modifying characteristics and attributes that define Concepts at various levels of detail (severity of a disease, associated morphology, etc.).
+    Records in the Standardized Vocabularies tables are derived from national or international vocabularies such as SNOMED-CT, RxNorm, and LOINC, or custom Concepts defined to cover various aspects of observational data analysis.
+    """
+
     concept_id = models.IntegerField(primary_key=True)
     concept_name = models.CharField(max_length=255)
     domain = models.ForeignKey("Domain", models.DO_NOTHING)
@@ -92,6 +115,13 @@ class Concept(Registry):
 
 
 class ConceptAncestor(Registry):
+    """The CONCEPT_ANCESTOR table is designed to simplify observational analysis by providing the complete hierarchical relationships between Concepts.
+
+    Only direct parent-child relationships between Concepts are stored in the CONCEPT_RELATIONSHIP table. To determine higher level ancestry connections, all individual direct relationships would have to be navigated at analysis time. The CONCEPT_ANCESTOR table includes records for all parent-child relationships, as well as grandparent-grandchild relationships and those of any other level of lineage. Using the CONCEPT_ANCESTOR table allows for querying for all descendants of a hierarchical concept. For example, drug ingredients and drug products are all descendants of a drug class ancestor.
+
+    This table is entirely derived from the CONCEPT, CONCEPT_RELATIONSHIP and RELATIONSHIP tables.
+    """
+
     ancestor_concept = models.ForeignKey(Concept, models.DO_NOTHING)
     descendant_concept = models.ForeignKey(
         Concept,
@@ -107,6 +137,11 @@ class ConceptAncestor(Registry):
 
 
 class ConceptClass(Registry):
+    """The CONCEPT_CLASS table is a reference table, which includes a list of the classifications used to differentiate Concepts within a given Vocabulary.
+
+    This reference table is populated with a single record for each Concept Class.
+    """
+
     concept_class_id = models.CharField(primary_key=True, max_length=20)
     concept_class_name = models.CharField(max_length=255)
     concept_class_concept = models.ForeignKey(Concept, models.DO_NOTHING)
@@ -117,6 +152,11 @@ class ConceptClass(Registry):
 
 
 class ConceptRelationship(Registry):
+    """The CONCEPT_RELATIONSHIP table contains records that define direct relationships between any two Concepts and the nature or type of the relationship.
+
+    Each type of a relationship is defined in the RELATIONSHIP table.
+    """
+
     concept_id_1 = models.ForeignKey(
         Concept, models.DO_NOTHING, db_column="concept_id_1"
     )
@@ -137,6 +177,8 @@ class ConceptRelationship(Registry):
 
 
 class ConceptSynonym(Registry):
+    """The CONCEPT_SYNONYM table is used to store alternate names and descriptions for Concepts."""
+
     concept = models.ForeignKey(Concept, models.DO_NOTHING)
     concept_synonym_name = models.CharField(max_length=1000)
     language_concept = models.ForeignKey(
@@ -149,6 +191,14 @@ class ConceptSynonym(Registry):
 
 
 class ConditionEra(Registry):
+    """A Condition Era is defined as a span of time when the Person is assumed to have a given condition.
+
+    Similar to Drug Eras, Condition Eras are chronological periods of Condition Occurrence. Combining individual Condition Occurrences into a single Condition Era serves two purposes:
+        It allows aggregation of chronic conditions that require frequent ongoing care, instead of treating each Condition Occurrence as an independent event.
+        It allows aggregation of multiple, closely timed doctor visits for the same Condition to avoid double-counting the Condition Occurrences.
+        For example, consider a Person who visits her Primary Care Physician (PCP) and who is referred to a specialist. At a later time, the Person visits the specialist, who confirms the PCP�s original diagnosis and provides the appropriate treatment to resolve the condition. These two independent doctor visits should be aggregated into one Condition Era.
+    """
+
     condition_era_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey("Person", models.DO_NOTHING)
     condition_concept = models.ForeignKey(Concept, models.DO_NOTHING)
@@ -162,6 +212,8 @@ class ConditionEra(Registry):
 
 
 class ConditionOccurrence(Registry):
+    """This table contains records of Events of a Person suggesting the presence of a disease or medical condition stated as a diagnosis, a sign, or a symptom, which is either observed by a Provider or reported by the patient."""
+
     condition_occurrence_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey("Person", models.DO_NOTHING)
     condition_concept = models.ForeignKey(Concept, models.DO_NOTHING)
@@ -207,6 +259,8 @@ class ConditionOccurrence(Registry):
 
 
 class Cost(Registry):
+    """The COST table captures records containing the cost of any medical event recorded in one of the OMOP clinical event tables such as DRUG_EXPOSURE, PROCEDURE_OCCURRENCE, VISIT_OCCURRENCE, VISIT_DETAIL, DEVICE_OCCURRENCE, OBSERVATION or MEASUREMENT."""
+
     cost_id = models.IntegerField(primary_key=True)
     cost_event_id = models.IntegerField()
     cost_domain = models.ForeignKey("Domain", models.DO_NOTHING)
@@ -278,6 +332,11 @@ class Cost(Registry):
 
 
 class Death(Registry):
+    """The death domain contains the clinical event for how and when a Person dies.
+
+    A person can have up to one record if the source system contains evidence about the Death, such as: Condition in an administrative claim, status of enrollment into a health plan, or explicit record in EHR data.
+    """
+
     person = models.ForeignKey("Person", models.DO_NOTHING)
     death_date = models.DateField()
     death_datetime = models.DateTimeField(blank=True, null=True)
@@ -306,6 +365,11 @@ class Death(Registry):
 
 
 class DeviceExposure(Registry):
+    """The Device domain captures information about a person�s exposure to a foreign physical object or instrument which is used for diagnostic or therapeutic purposes through a mechanism beyond chemical action.
+
+    Devices include implantable objects (e.g. pacemakers, stents, artificial joints), medical equipment and supplies (e.g. bandages, crutches, syringes), other instruments used in medical procedures (e.g. sutures, defibrillators) and material used in clinical care (e.g. adhesives, body material, dental material, surgical material).
+    """
+
     device_exposure_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey("Person", models.DO_NOTHING)
     device_concept = models.ForeignKey(Concept, models.DO_NOTHING)
@@ -358,6 +422,8 @@ class DeviceExposure(Registry):
 
 
 class Domain(Registry):
+    """The DOMAIN table includes a list of OMOP-defined Domains the Concepts of the Standardized Vocabularies can belong to. A Domain defines the set of allowable Concepts for the standardized fields in the CDM tables."""
+
     domain_id = models.CharField(primary_key=True, max_length=20)
     domain_name = models.CharField(max_length=255)
     domain_concept = models.ForeignKey(Concept, models.DO_NOTHING)
@@ -368,6 +434,8 @@ class Domain(Registry):
 
 
 class DoseEra(Registry):
+    """A Dose Era is defined as a span of time when the Person is assumed to be exposed to a constant dose of a specific active ingredient."""
+
     dose_era_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey("Person", models.DO_NOTHING)
     drug_concept = models.ForeignKey(Concept, models.DO_NOTHING)
@@ -384,6 +452,11 @@ class DoseEra(Registry):
 
 
 class DrugEra(Registry):
+    """A Drug Era is defined as a span of time when the Person is assumed to be exposed to a particular active ingredient.
+
+    A Drug Era is not the same as a Drug Exposure: Exposures are individual records corresponding to the source when Drug was delivered to the Person, while successive periods of Drug Exposures are combined under certain rules to produce continuous Drug Eras.
+    """
+
     drug_era_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey("Person", models.DO_NOTHING)
     drug_concept = models.ForeignKey(Concept, models.DO_NOTHING)
@@ -398,6 +471,11 @@ class DrugEra(Registry):
 
 
 class DrugExposure(Registry):
+    """This table captures records about the exposure to a Drug ingested or otherwise introduced into the body.
+
+    A Drug is a biochemical substance formulated in such a way that when administered to a Person it will exert a certain biochemical effect on the metabolism. Drugs include prescription and over-the-counter medicines, vaccines, and large-molecule biologic therapies. Radiological devices ingested or applied locally do not count as Drugs.
+    """
+
     drug_exposure_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey("Person", models.DO_NOTHING)
     drug_concept = models.ForeignKey(Concept, models.DO_NOTHING)
@@ -448,6 +526,11 @@ class DrugExposure(Registry):
 
 
 class DrugStrength(Registry):
+    """The DRUG_STRENGTH table contains structured content about the amount or concentration and associated units of a specific ingredient contained within a particular drug product.
+
+    This table is supplemental information to support standardized analysis of drug utilization.
+    """
+
     drug_concept = models.ForeignKey(Concept, models.DO_NOTHING)
     ingredient_concept = models.ForeignKey(
         Concept, models.DO_NOTHING, related_name="drugstrength_ingredient_concept_set"
@@ -493,6 +576,11 @@ class DrugStrength(Registry):
 
 
 class Episode(Registry):
+    """The EPISODE table aggregates lower-level clinical events (VISIT_OCCURRENCE, DRUG_EXPOSURE, PROCEDURE_OCCURRENCE, DEVICE_EXPOSURE) into a higher-level abstraction representing clinically and analytically relevant disease phases,outcomes and treatments. The EPISODE_EVENT table connects qualifying clinical events (VISIT_OCCURRENCE, DRUG_EXPOSURE, PROCEDURE_OCCURRENCE, DEVICE_EXPOSURE) to the appropriate EPISODE entry.
+
+    For example cancers including their development over time, their treatment, and final resolution.
+    """
+
     episode_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey("Person", models.DO_NOTHING)
     episode_concept = models.ForeignKey(Concept, models.DO_NOTHING)
@@ -523,6 +611,11 @@ class Episode(Registry):
 
 
 class EpisodeEvent(Registry):
+    """The EPISODE_EVENT table connects qualifying clinical events (such as CONDITION_OCCURRENCE, DRUG_EXPOSURE, PROCEDURE_OCCURRENCE, MEASUREMENT) to the appropriate EPISODE entry.
+
+    For example, linking the precise location of the metastasis (cancer modifier in MEASUREMENT) to the disease episode.
+    """
+
     episode = models.ForeignKey(Episode, models.DO_NOTHING)
     event_id = models.IntegerField()
     episode_event_field_concept = models.ForeignKey(Concept, models.DO_NOTHING)
@@ -533,6 +626,11 @@ class EpisodeEvent(Registry):
 
 
 class FactRelationship(Registry):
+    """The FACT_RELATIONSHIP table contains records about the relationships between facts stored as records in any table of the CDM.
+
+    Relationships can be defined between facts from the same domain, or different domains. Examples of Fact Relationships include: Person relationships (parent-child), care site relationships (hierarchical organizational structure of facilities within a health system), indication relationship (between drug exposures and associated conditions), usage relationships (of devices during the course of an associated procedure), or facts derived from one another (measurements derived from an associated specimen).
+    """
+
     domain_concept_id_1 = models.ForeignKey(
         Concept, models.DO_NOTHING, db_column="domain_concept_id_1"
     )
@@ -556,6 +654,8 @@ class FactRelationship(Registry):
 
 
 class Location(Registry):
+    """The LOCATION table represents a generic way to capture physical location or address information of Persons and Care Sites."""
+
     location_id = models.IntegerField(primary_key=True)
     address_1 = models.CharField(max_length=50, blank=True, null=True)
     address_2 = models.CharField(max_length=50, blank=True, null=True)
@@ -581,6 +681,11 @@ class Location(Registry):
 
 
 class Measurement(Registry):
+    """The MEASUREMENT table contains records of Measurements, i.e. structured values (numerical or categorical) obtained through systematic and standardized examination or testing of a Person or Person�s sample.
+
+    The MEASUREMENT table contains both orders and results of such Measurements as laboratory tests, vital signs, quantitative findings from pathology reports, etc. Measurements are stored as attribute value pairs, with the attribute as the Measurement Concept and the value representing the result. The value can be a Concept (stored in VALUE_AS_CONCEPT), or a numerical value (VALUE_AS_NUMBER) with a Unit (UNIT_CONCEPT_ID). The Procedure for obtaining the sample is housed in the PROCEDURE_OCCURRENCE table, though it is unnecessary to create a PROCEDURE_OCCURRENCE record for each measurement if one does not exist in the source data. Measurements differ from Observations in that they require a standardized test or some other activity to generate a quantitative or qualitative result. If there is no result, it is assumed that the lab test was conducted but the result was not captured.
+    """
+
     measurement_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey("Person", models.DO_NOTHING)
     measurement_concept = models.ForeignKey(Concept, models.DO_NOTHING)
@@ -661,6 +766,8 @@ class Measurement(Registry):
 
 
 class Metadata(Registry):
+    """The METADATA table contains metadata information about a dataset that has been transformed to the OMOP Common Data Model."""
+
     metadata_id = models.IntegerField(primary_key=True)
     metadata_concept = models.ForeignKey(Concept, models.DO_NOTHING)
     metadata_type_concept = models.ForeignKey(
@@ -687,6 +794,11 @@ class Metadata(Registry):
 
 
 class Note(Registry):
+    """The NOTE table captures unstructured information that was recorded by a provider about a patient in free text (in ASCII, or preferably in UTF8 format) notes on a given date.
+
+    The type of note_text is CLOB or varchar(MAX) depending on RDBMS.
+    """
+
     note_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey("Person", models.DO_NOTHING)
     note_date = models.DateField()
@@ -726,6 +838,8 @@ class Note(Registry):
 
 
 class NoteNlp(Registry):
+    """The NOTE_NLP table encodes all output of NLP on clinical notes. Each row represents a single extracted term from a note."""
+
     note_nlp_id = models.IntegerField(primary_key=True)
     note_id = models.IntegerField()
     section_concept = models.ForeignKey(
@@ -761,6 +875,11 @@ class NoteNlp(Registry):
 
 
 class Observation(Registry):
+    """The OBSERVATION table captures clinical facts about a Person obtained in the context of examination, questioning or a procedure.
+
+    Any data that cannot be represented by any other domains, such as social and lifestyle facts, medical history, family history, etc. are recorded here.
+    """
+
     observation_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey("Person", models.DO_NOTHING)
     observation_concept = models.ForeignKey(Concept, models.DO_NOTHING)
@@ -829,6 +948,8 @@ class Observation(Registry):
 
 
 class ObservationPeriod(Registry):
+    """This table contains records which define spans of time during which two conditions are expected to hold: (i) Clinical Events that happened to the Person are recorded in the Event tables, and (ii) absense of records indicate such Events did not occur during this span of time."""
+
     observation_period_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey("Person", models.DO_NOTHING)
     observation_period_start_date = models.DateField()
@@ -841,6 +962,11 @@ class ObservationPeriod(Registry):
 
 
 class PayerPlanPeriod(Registry):
+    """The PAYER_PLAN_PERIOD table captures details of the period of time that a Person is continuously enrolled under a specific health Plan benefit structure from a given Payer.
+
+    Each Person receiving healthcare is typically covered by a health benefit plan, which pays for (fully or partially), or directly provides, the care. These benefit plans are provided by payers, such as health insurances or state or government agencies. In each plan the details of the health benefits are defined for the Person or her family, and the health benefit Plan might change over time typically with increasing utilization (reaching certain cost thresholds such as deductibles), plan availability and purchasing choices of the Person. The unique combinations of Payer organizations, health benefit Plans and time periods in which they are valid for a Person are recorded in this table.
+    """
+
     payer_plan_period_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey("Person", models.DO_NOTHING)
     payer_plan_period_start_date = models.DateField()
@@ -907,6 +1033,11 @@ class PayerPlanPeriod(Registry):
 
 
 class Person(Registry):
+    """This table serves as the central identity management for all Persons in the database.
+
+    It contains records that uniquely identify each person or patient, and some demographic information.
+    """
+
     person_id = models.IntegerField(primary_key=True)
     gender_concept = models.ForeignKey(Concept, models.DO_NOTHING)
     year_of_birth = models.IntegerField()
@@ -954,6 +1085,8 @@ class Person(Registry):
 
 
 class ProcedureOccurrence(Registry):
+    """This table contains records of activities or processes ordered by, or carried out by, a healthcare provider on the patient with a diagnostic or therapeutic purpose."""
+
     procedure_occurrence_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey(Person, models.DO_NOTHING)
     procedure_concept = models.ForeignKey(Concept, models.DO_NOTHING)
@@ -997,6 +1130,11 @@ class ProcedureOccurrence(Registry):
 
 
 class Provider(Registry):
+    """The PROVIDER table contains a list of uniquely identified healthcare providers.
+
+    These are individuals providing hands-on healthcare to patients, such as physicians, nurses, midwives, physical therapists etc.
+    """
+
     provider_id = models.IntegerField(primary_key=True)
     provider_name = models.CharField(max_length=255, blank=True, null=True)
     npi = models.CharField(max_length=20, blank=True, null=True)
@@ -1037,6 +1175,8 @@ class Provider(Registry):
 
 
 class Relationship(Registry):
+    """The RELATIONSHIP table provides a reference list of all types of relationships that can be used to associate any two concepts in the CONCEPT_RELATIONSHP table."""
+
     relationship_id = models.CharField(primary_key=True, max_length=20)
     relationship_name = models.CharField(max_length=255)
     is_hierarchical = models.CharField(max_length=1)
@@ -1050,6 +1190,11 @@ class Relationship(Registry):
 
 
 class SourceToConceptMap(Registry):
+    """The source to concept map table is a legacy data structure within the OMOP Common Data Model, recommended for use in ETL processes to maintain local source codes which are not available as Concepts in the Standardized Vocabularies, and to establish mappings for each source code into a Standard Concept as target_concept_ids that can be used to populate the Common Data Model tables.
+
+    The SOURCE_TO_CONCEPT_MAP table is no longer populated with content within the Standardized Vocabularies published to the OMOP community.
+    """
+
     source_code = models.CharField(max_length=50)
     source_concept = models.ForeignKey(Concept, models.DO_NOTHING)
     source_vocabulary_id = models.CharField(max_length=20)
@@ -1068,6 +1213,8 @@ class SourceToConceptMap(Registry):
 
 
 class Specimen(Registry):
+    """The specimen domain contains the records identifying biological samples from a person."""
+
     specimen_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey(Person, models.DO_NOTHING)
     specimen_concept = models.ForeignKey(Concept, models.DO_NOTHING)
@@ -1112,6 +1259,11 @@ class Specimen(Registry):
 
 
 class VisitDetail(Registry):
+    """The VISIT_DETAIL table is an optional table used to represents details of each record in the parent VISIT_OCCURRENCE table.
+
+    A good example of this would be the movement between units in a hospital during an inpatient stay or claim lines associated with a one insurance claim. For every record in the VISIT_OCCURRENCE table there may be 0 or more records in the VISIT_DETAIL table with a 1:n relationship where n may be 0. The VISIT_DETAIL table is structurally very similar to VISIT_OCCURRENCE table and belongs to the visit domain.
+    """
+
     visit_detail_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey(Person, models.DO_NOTHING)
     visit_detail_concept = models.ForeignKey(Concept, models.DO_NOTHING)
@@ -1168,6 +1320,11 @@ class VisitDetail(Registry):
 
 
 class VisitOccurrence(Registry):
+    """This table contains Events where Persons engage with the healthcare system for a duration of time.
+
+    They are often also called �Encounters�. Visits are defined by a configuration of circumstances under which they occur, such as (i) whether the patient comes to a healthcare institution, the other way around, or the interaction is remote, (ii) whether and what kind of trained medical staff is delivering the service during the Visit, and (iii) whether the Visit is transient or for a longer period involving a stay in bed.
+    """
+
     visit_occurrence_id = models.IntegerField(primary_key=True)
     person = models.ForeignKey(Person, models.DO_NOTHING)
     visit_concept = models.ForeignKey(Concept, models.DO_NOTHING)
@@ -1216,6 +1373,8 @@ class VisitOccurrence(Registry):
 
 
 class Vocabulary(Registry):
+    """The VOCABULARY table includes a list of the Vocabularies collected from various sources or created de novo by the OMOP community. This reference table is populated with a single record for each Vocabulary source and includes a descriptive name and other associated attributes for the Vocabulary."""
+
     vocabulary_id = models.CharField(primary_key=True, max_length=20)
     vocabulary_name = models.CharField(max_length=255)
     vocabulary_reference = models.CharField(max_length=255, blank=True, null=True)
