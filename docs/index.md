@@ -7,6 +7,7 @@
 :maxdepth: 1
 :hidden:
 
+guide
 notes
 reference
 changelog
