@@ -62,7 +62,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: 472bdad691b4483dea759eadb37110bd
-          projectName: lrex
+          projectName: omop
           directory: "_build/html"
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
           branch: main
