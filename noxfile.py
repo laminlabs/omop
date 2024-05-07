@@ -1,5 +1,5 @@
 import nox
-from laminci.nox import build_docs, login_testuser1, run_pre_commit, run_pytest
+from laminci.nox import build_docs, run_pre_commit, run_pytest
 
 # we'd like to aggregate coverage information across sessions
 # and for this the code needs to be located in the same
@@ -16,6 +16,5 @@ def lint(session: nox.Session) -> None:
 @nox.session()
 def build(session):
     session.run(*"uv pip install --system -e .[dev]".split())
-    login_testuser1(session)
     run_pytest(session)
     build_docs(session, strict=True)
