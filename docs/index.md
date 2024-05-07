@@ -8,7 +8,6 @@
 :hidden:
 
 guide/index
-notes/index
 reference
 changelog
 ```
