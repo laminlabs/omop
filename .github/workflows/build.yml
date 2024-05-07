@@ -58,3 +58,12 @@ jobs:
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+      - uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: 472bdad691b4483dea759eadb37110bd
+          projectName: lrex
+          directory: "_build/html"
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
+          wranglerVersion: "3"
