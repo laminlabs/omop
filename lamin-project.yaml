@@ -1,0 +1,5 @@
+project_name: OMOP
+description: OMOP Common Data Model
+project_slug: omop
+repository_name: omop
+package_name: omop
