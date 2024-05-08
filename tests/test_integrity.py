@@ -4,7 +4,7 @@ import pytest
 
 @pytest.fixture
 def setup_instance():
-    ln_setup.init(storage="./testdb", schema="bionty,omop")
+    ln_setup.init(storage="./testdb", schema="omop")
     yield
     ln_setup.delete("testdb", force=True)
 
