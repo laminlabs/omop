@@ -100,9 +100,9 @@ class Concept(Registry):
 
     concept_id = models.IntegerField(primary_key=True)
     concept_name = models.CharField(max_length=255)
-    domain = models.ForeignKey("Domain", models.DO_NOTHING)
-    vocabulary = models.ForeignKey("Vocabulary", models.DO_NOTHING)
-    concept_class = models.ForeignKey("ConceptClass", models.DO_NOTHING)
+    domain_id = models.CharField(max_length=255)
+    vocabulary_id = models.CharField(max_length=255)
+    concept_class = models.CharField(max_length=255)
     standard_concept = models.CharField(max_length=1, blank=True, null=True)
     concept_code = models.CharField(max_length=50)
     valid_start_date = models.DateField()
@@ -136,19 +136,19 @@ class ConceptAncestor(Registry):
         db_table = "concept_ancestor"
 
 
-class ConceptClass(Registry):
-    """The CONCEPT_CLASS table is a reference table, which includes a list of the classifications used to differentiate Concepts within a given Vocabulary.
+# class ConceptClass(Registry):
+#     """The CONCEPT_CLASS table is a reference table, which includes a list of the classifications used to differentiate Concepts within a given Vocabulary.
 
-    This reference table is populated with a single record for each Concept Class.
-    """
+#     This reference table is populated with a single record for each Concept Class.
+#     """
 
-    concept_class_id = models.CharField(primary_key=True, max_length=20)
-    concept_class_name = models.CharField(max_length=255)
-    concept_class_concept = models.ForeignKey(Concept, models.DO_NOTHING)
+#     concept_class_id = models.CharField(primary_key=True, max_length=20)
+#     concept_class_name = models.CharField(max_length=255)
+#     concept_class_concept = models.ForeignKey(Concept, models.DO_NOTHING)  # introduce a loop
 
-    class Meta:
-        managed = True
-        db_table = "concept_class"
+#     class Meta:
+#         managed = True
+#         db_table = "concept_class"
 
 
 class ConceptRelationship(Registry):
