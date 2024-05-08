@@ -49,8 +49,6 @@ This is the complete API reference:
    Vocabulary
 """
 
-_schema_id = "kjsr"
-_name = "omop"
 __version__ = "0.0.1"  # denote a pre-release for 0.1.0 with 0.1rc1
 
 from lamindb_setup import _check_instance_setup
