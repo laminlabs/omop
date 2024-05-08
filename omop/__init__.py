@@ -15,7 +15,6 @@ This is the complete API reference:
    CohortDefinition
    Concept
    ConceptAncestor
-   ConceptClass
    ConceptRelationship
    ConceptSynonym
    ConditionEra
@@ -74,7 +73,6 @@ if _check_instance_setup():
         CohortDefinition,
         Concept,
         ConceptAncestor,
-        ConceptClass,
         ConceptRelationship,
         ConceptSynonym,
         ConditionEra,
