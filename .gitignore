@@ -111,3 +111,4 @@ lamin_sphinx
 docs/conf.py
 _docs_tmp*
 testdb/
+OMOP_5.4/
