@@ -273,41 +273,41 @@ class Cost(Record):
         null=True,
     )
     total_charge = models.DecimalField(
-        max_digits=65535, decimal_places=65535, blank=True, null=True
+        max_digits=1000, decimal_places=1000, blank=True, null=True
     )
     total_cost = models.DecimalField(
-        max_digits=65535, decimal_places=65535, blank=True, null=True
+        max_digits=1000, decimal_places=1000, blank=True, null=True
     )
     total_paid = models.DecimalField(
-        max_digits=65535, decimal_places=65535, blank=True, null=True
+        max_digits=1000, decimal_places=1000, blank=True, null=True
     )
     paid_by_payer = models.DecimalField(
-        max_digits=65535, decimal_places=65535, blank=True, null=True
+        max_digits=1000, decimal_places=1000, blank=True, null=True
     )
     paid_by_patient = models.DecimalField(
-        max_digits=65535, decimal_places=65535, blank=True, null=True
+        max_digits=1000, decimal_places=1000, blank=True, null=True
     )
     paid_patient_copay = models.DecimalField(
-        max_digits=65535, decimal_places=65535, blank=True, null=True
+        max_digits=1000, decimal_places=1000, blank=True, null=True
     )
     paid_patient_coinsurance = models.DecimalField(
-        max_digits=65535, decimal_places=65535, blank=True, null=True
+        max_digits=1000, decimal_places=1000, blank=True, null=True
     )
     paid_patient_deductible = models.DecimalField(
-        max_digits=65535, decimal_places=65535, blank=True, null=True
+        max_digits=1000, decimal_places=1000, blank=True, null=True
     )
     paid_by_primary = models.DecimalField(
-        max_digits=65535, decimal_places=65535, blank=True, null=True
+        max_digits=1000, decimal_places=1000, blank=True, null=True
     )
     paid_ingredient_cost = models.DecimalField(
-        max_digits=65535, decimal_places=65535, blank=True, null=True
+        max_digits=1000, decimal_places=1000, blank=True, null=True
     )
     paid_dispensing_fee = models.DecimalField(
-        max_digits=65535, decimal_places=65535, blank=True, null=True
+        max_digits=1000, decimal_places=1000, blank=True, null=True
     )
     payer_plan_period_id = models.IntegerField(blank=True, null=True)
     amount_allowed = models.DecimalField(
-        max_digits=65535, decimal_places=65535, blank=True, null=True
+        max_digits=1000, decimal_places=1000, blank=True, null=True
     )
     revenue_code_concept = models.ForeignKey(
         Concept,
@@ -442,7 +442,7 @@ class DoseEra(Record):
     unit_concept = models.ForeignKey(
         Concept, models.DO_NOTHING, related_name="doseera_unit_concept_set"
     )
-    dose_value = models.DecimalField(max_digits=65535, decimal_places=65535)
+    dose_value = models.DecimalField(max_digits=1000, decimal_places=1000)
     dose_era_start_date = models.DateField()
     dose_era_end_date = models.DateField()
 
@@ -490,7 +490,7 @@ class DrugExposure(Record):
     stop_reason = models.CharField(max_length=20, blank=True, null=True)
     refills = models.IntegerField(blank=True, null=True)
     quantity = models.DecimalField(
-        max_digits=65535, decimal_places=65535, blank=True, null=True
+        max_digits=1000, decimal_places=1000, blank=True, null=True
     )
     days_supply = models.IntegerField(blank=True, null=True)
     sig = models.TextField(blank=True, null=True)
@@ -536,7 +536,7 @@ class DrugStrength(Record):
         Concept, models.DO_NOTHING, related_name="drugstrength_ingredient_concept_set"
     )
     amount_value = models.DecimalField(
-        max_digits=65535, decimal_places=65535, blank=True, null=True
+        max_digits=1000, decimal_places=1000, blank=True, null=True
     )
     amount_unit_concept = models.ForeignKey(
         Concept,
@@ -546,7 +546,7 @@ class DrugStrength(Record):
         null=True,
     )
     numerator_value = models.DecimalField(
-        max_digits=65535, decimal_places=65535, blank=True, null=True
+        max_digits=1000, decimal_places=1000, blank=True, null=True
     )
     numerator_unit_concept = models.ForeignKey(
         Concept,
@@ -556,7 +556,7 @@ class DrugStrength(Record):
         null=True,
     )
     denominator_value = models.DecimalField(
-        max_digits=65535, decimal_places=65535, blank=True, null=True
+        max_digits=1000, decimal_places=1000, blank=True, null=True
     )
     denominator_unit_concept = models.ForeignKey(
         Concept,
@@ -669,10 +669,10 @@ class Location(Record):
     )
     country_source_value = models.CharField(max_length=80, blank=True, null=True)
     latitude = models.DecimalField(
-        max_digits=65535, decimal_places=65535, blank=True, null=True
+        max_digits=1000, decimal_places=1000, blank=True, null=True
     )
     longitude = models.DecimalField(
-        max_digits=65535, decimal_places=65535, blank=True, null=True
+        max_digits=1000, decimal_places=1000, blank=True, null=True
     )
 
     class Meta:
@@ -705,7 +705,7 @@ class Measurement(Record):
         null=True,
     )
     value_as_number = models.DecimalField(
-        max_digits=65535, decimal_places=65535, blank=True, null=True
+        max_digits=1000, decimal_places=1000, blank=True, null=True
     )
     value_as_concept = models.ForeignKey(
         Concept,
@@ -722,10 +722,10 @@ class Measurement(Record):
         null=True,
     )
     range_low = models.DecimalField(
-        max_digits=65535, decimal_places=65535, blank=True, null=True
+        max_digits=1000, decimal_places=1000, blank=True, null=True
     )
     range_high = models.DecimalField(
-        max_digits=65535, decimal_places=65535, blank=True, null=True
+        max_digits=1000, decimal_places=1000, blank=True, null=True
     )
     provider = models.ForeignKey("Provider", models.DO_NOTHING, blank=True, null=True)
     visit_occurrence = models.ForeignKey(
@@ -783,7 +783,7 @@ class Metadata(Record):
         null=True,
     )
     value_as_number = models.DecimalField(
-        max_digits=65535, decimal_places=65535, blank=True, null=True
+        max_digits=1000, decimal_places=1000, blank=True, null=True
     )
     metadata_date = models.DateField(blank=True, null=True)
     metadata_datetime = models.DateTimeField(blank=True, null=True)
@@ -891,7 +891,7 @@ class Observation(Record):
         related_name="observation_observation_type_concept_set",
     )
     value_as_number = models.DecimalField(
-        max_digits=65535, decimal_places=65535, blank=True, null=True
+        max_digits=1000, decimal_places=1000, blank=True, null=True
     )
     value_as_string = models.CharField(max_length=60, blank=True, null=True)
     value_as_concept = models.ForeignKey(
@@ -1224,7 +1224,7 @@ class Specimen(Record):
     specimen_date = models.DateField()
     specimen_datetime = models.DateTimeField(blank=True, null=True)
     quantity = models.DecimalField(
-        max_digits=65535, decimal_places=65535, blank=True, null=True
+        max_digits=1000, decimal_places=1000, blank=True, null=True
     )
     unit_concept = models.ForeignKey(
         Concept,
