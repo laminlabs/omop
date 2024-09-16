@@ -237,74 +237,74 @@ class Migration(migrations.Migration):
                 (
                     "total_charge",
                     models.DecimalField(
-                        blank=True, decimal_places=65535, max_digits=65535, null=True
+                        blank=True, decimal_places=1000, max_digits=1000, null=True
                     ),
                 ),
                 (
                     "total_cost",
                     models.DecimalField(
-                        blank=True, decimal_places=65535, max_digits=65535, null=True
+                        blank=True, decimal_places=1000, max_digits=1000, null=True
                     ),
                 ),
                 (
                     "total_paid",
                     models.DecimalField(
-                        blank=True, decimal_places=65535, max_digits=65535, null=True
+                        blank=True, decimal_places=1000, max_digits=1000, null=True
                     ),
                 ),
                 (
                     "paid_by_payer",
                     models.DecimalField(
-                        blank=True, decimal_places=65535, max_digits=65535, null=True
+                        blank=True, decimal_places=1000, max_digits=1000, null=True
                     ),
                 ),
                 (
                     "paid_by_patient",
                     models.DecimalField(
-                        blank=True, decimal_places=65535, max_digits=65535, null=True
+                        blank=True, decimal_places=1000, max_digits=1000, null=True
                     ),
                 ),
                 (
                     "paid_patient_copay",
                     models.DecimalField(
-                        blank=True, decimal_places=65535, max_digits=65535, null=True
+                        blank=True, decimal_places=1000, max_digits=1000, null=True
                     ),
                 ),
                 (
                     "paid_patient_coinsurance",
                     models.DecimalField(
-                        blank=True, decimal_places=65535, max_digits=65535, null=True
+                        blank=True, decimal_places=1000, max_digits=1000, null=True
                     ),
                 ),
                 (
                     "paid_patient_deductible",
                     models.DecimalField(
-                        blank=True, decimal_places=65535, max_digits=65535, null=True
+                        blank=True, decimal_places=1000, max_digits=1000, null=True
                     ),
                 ),
                 (
                     "paid_by_primary",
                     models.DecimalField(
-                        blank=True, decimal_places=65535, max_digits=65535, null=True
+                        blank=True, decimal_places=1000, max_digits=1000, null=True
                     ),
                 ),
                 (
                     "paid_ingredient_cost",
                     models.DecimalField(
-                        blank=True, decimal_places=65535, max_digits=65535, null=True
+                        blank=True, decimal_places=1000, max_digits=1000, null=True
                     ),
                 ),
                 (
                     "paid_dispensing_fee",
                     models.DecimalField(
-                        blank=True, decimal_places=65535, max_digits=65535, null=True
+                        blank=True, decimal_places=1000, max_digits=1000, null=True
                     ),
                 ),
                 ("payer_plan_period_id", models.IntegerField(blank=True, null=True)),
                 (
                     "amount_allowed",
                     models.DecimalField(
-                        blank=True, decimal_places=65535, max_digits=65535, null=True
+                        blank=True, decimal_places=1000, max_digits=1000, null=True
                     ),
                 ),
                 (
@@ -379,19 +379,19 @@ class Migration(migrations.Migration):
                 (
                     "amount_value",
                     models.DecimalField(
-                        blank=True, decimal_places=65535, max_digits=65535, null=True
+                        blank=True, decimal_places=1000, max_digits=1000, null=True
                     ),
                 ),
                 (
                     "numerator_value",
                     models.DecimalField(
-                        blank=True, decimal_places=65535, max_digits=65535, null=True
+                        blank=True, decimal_places=1000, max_digits=1000, null=True
                     ),
                 ),
                 (
                     "denominator_value",
                     models.DecimalField(
-                        blank=True, decimal_places=65535, max_digits=65535, null=True
+                        blank=True, decimal_places=1000, max_digits=1000, null=True
                     ),
                 ),
                 ("box_size", models.IntegerField(blank=True, null=True)),
@@ -604,13 +604,13 @@ class Migration(migrations.Migration):
                 (
                     "latitude",
                     models.DecimalField(
-                        blank=True, decimal_places=65535, max_digits=65535, null=True
+                        blank=True, decimal_places=1000, max_digits=1000, null=True
                     ),
                 ),
                 (
                     "longitude",
                     models.DecimalField(
-                        blank=True, decimal_places=65535, max_digits=65535, null=True
+                        blank=True, decimal_places=1000, max_digits=1000, null=True
                     ),
                 ),
                 (
@@ -683,7 +683,7 @@ class Migration(migrations.Migration):
                 (
                     "value_as_number",
                     models.DecimalField(
-                        blank=True, decimal_places=65535, max_digits=65535, null=True
+                        blank=True, decimal_places=1000, max_digits=1000, null=True
                     ),
                 ),
                 ("metadata_date", models.DateField(blank=True, null=True)),
@@ -1063,7 +1063,7 @@ class Migration(migrations.Migration):
                 ("dose_era_id", models.IntegerField(primary_key=True, serialize=False)),
                 (
                     "dose_value",
-                    models.DecimalField(decimal_places=65535, max_digits=65535),
+                    models.DecimalField(decimal_places=1000, max_digits=1000),
                 ),
                 ("dose_era_start_date", models.DateField()),
                 ("dose_era_end_date", models.DateField()),
@@ -1353,7 +1353,7 @@ class Migration(migrations.Migration):
                 (
                     "quantity",
                     models.DecimalField(
-                        blank=True, decimal_places=65535, max_digits=65535, null=True
+                        blank=True, decimal_places=1000, max_digits=1000, null=True
                     ),
                 ),
                 (
@@ -1776,7 +1776,7 @@ class Migration(migrations.Migration):
                 (
                     "value_as_number",
                     models.DecimalField(
-                        blank=True, decimal_places=65535, max_digits=65535, null=True
+                        blank=True, decimal_places=1000, max_digits=1000, null=True
                     ),
                 ),
                 (
@@ -2013,19 +2013,19 @@ class Migration(migrations.Migration):
                 (
                     "value_as_number",
                     models.DecimalField(
-                        blank=True, decimal_places=65535, max_digits=65535, null=True
+                        blank=True, decimal_places=1000, max_digits=1000, null=True
                     ),
                 ),
                 (
                     "range_low",
                     models.DecimalField(
-                        blank=True, decimal_places=65535, max_digits=65535, null=True
+                        blank=True, decimal_places=1000, max_digits=1000, null=True
                     ),
                 ),
                 (
                     "range_high",
                     models.DecimalField(
-                        blank=True, decimal_places=65535, max_digits=65535, null=True
+                        blank=True, decimal_places=1000, max_digits=1000, null=True
                     ),
                 ),
                 (
@@ -2178,7 +2178,7 @@ class Migration(migrations.Migration):
                 (
                     "quantity",
                     models.DecimalField(
-                        blank=True, decimal_places=65535, max_digits=65535, null=True
+                        blank=True, decimal_places=1000, max_digits=1000, null=True
                     ),
                 ),
                 ("days_supply", models.IntegerField(blank=True, null=True)),
