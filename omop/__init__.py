@@ -57,8 +57,8 @@ from lamindb_setup import _check_instance_setup
 # trigger instance loading if users
 # want to access attributes
 def __getattr__(name):
-    if name not in {"models"}:
-        _check_instance_setup(from_lamindb=True)
+    if name != "models":
+        _check_instance_setup(from_module="omop")
     return globals()[name]
 
 
