@@ -1,9 +1,12 @@
 from __future__ import annotations
 
-from datetime import datetime
+from typing import TYPE_CHECKING
 
 from django.db import models
-from lnschema_core.models import Record, CanValidate
+from lnschema_core.models import CanValidate, Record
+
+if TYPE_CHECKING:
+    from datetime import datetime
 
 
 class CareSite(Record, CanValidate):
@@ -14,8 +17,12 @@ class CareSite(Record, CanValidate):
     place_of_service_concept: Concept | None = models.ForeignKey(
         "Concept", models.DO_NOTHING, blank=True, null=True
     )
-    location: Location | None = models.ForeignKey("Location", models.DO_NOTHING, blank=True, null=True)
-    care_site_source_value: str | None = models.CharField(max_length=50, blank=True, null=True)
+    location: Location | None = models.ForeignKey(
+        "Location", models.DO_NOTHING, blank=True, null=True
+    )
+    care_site_source_value: str | None = models.CharField(
+        max_length=50, blank=True, null=True
+    )
     place_of_service_source_value: str | None = models.CharField(
         max_length=50, blank=True, null=True
     )
@@ -23,7 +30,6 @@ class CareSite(Record, CanValidate):
     class Meta:
         managed = True
         db_table = "care_site"
-
 
 
 class CdmSource(Record, CanValidate):
@@ -36,11 +42,13 @@ class CdmSource(Record, CanValidate):
     source_documentation_reference: str | None = models.CharField(
         max_length=255, blank=True, null=True
     )
-    cdm_etl_reference: str | None = models.CharField(max_length=255, blank=True, null=True)
-    source_release_date: datetime.date = models.DateField()
-    cdm_release_date: datetime.date = models.DateField()
+    cdm_etl_reference: str | None = models.CharField(
+        max_length=255, blank=True, null=True
+    )
+    source_release_date: datetime = models.DateField()
+    cdm_release_date: datetime = models.DateField()
     cdm_version: str | None = models.CharField(max_length=10, blank=True, null=True)
-    cdm_version_concept: Concept = models.ForeignKey(Concept, models.DO_NOTHING)
+    cdm_version_concept: Concept = models.ForeignKey("Concept", models.DO_NOTHING)
     vocabulary_version: str = models.CharField(max_length=20)
 
     class Meta:
@@ -220,8 +228,8 @@ class ConditionEra(Record, CanValidate):
 
 class ConditionOccurrence(Record, CanValidate):
     """Records of Events of a Person.
-    
-    These events suggest the presence of a disease or medical condition stated as a diagnosis, a sign, 
+
+    These events suggest the presence of a disease or medical condition stated as a diagnosis, a sign,
     or a symptom, which is either observed by a Provider or reported by the patient.
     """
 
@@ -245,7 +253,9 @@ class ConditionOccurrence(Record, CanValidate):
         null=True,
     )
     stop_reason: str = models.CharField(max_length=20, blank=True, null=True)
-    provider: Provider = models.ForeignKey("Provider", models.DO_NOTHING, blank=True, null=True)
+    provider: Provider = models.ForeignKey(
+        "Provider", models.DO_NOTHING, blank=True, null=True
+    )
     visit_occurrence: VisitOccurrence = models.ForeignKey(
         "VisitOccurrence", models.DO_NOTHING, blank=True, null=True
     )
@@ -271,7 +281,7 @@ class ConditionOccurrence(Record, CanValidate):
 
 class Cost(Record, CanValidate):
     """Records containing the cost of any medical event recorded in one of the OMOP clinical event tables.
-    
+
     The event tables include DRUG_EXPOSURE, PROCEDURE_OCCURRENCE, VISIT_OCCURRENCE, VISIT_DETAIL, DEVICE_OCCURRENCE, OBSERVATION or MEASUREMENT.
     """
 
@@ -330,7 +340,9 @@ class Cost(Record, CanValidate):
         blank=True,
         null=True,
     )
-    revenue_code_source_value: str = models.CharField(max_length=50, blank=True, null=True)
+    revenue_code_source_value: str = models.CharField(
+        max_length=50, blank=True, null=True
+    )
     drg_concept: Concept = models.ForeignKey(
         Concept,
         models.DO_NOTHING,
@@ -348,7 +360,7 @@ class Cost(Record, CanValidate):
 class Death(Record, CanValidate):
     """Clinical event for how and when a Person dies.
 
-    A person can have up to one record if the source system contains evidence about the Death, 
+    A person can have up to one record if the source system contains evidence about the Death,
     such as: Condition in an administrative claim, status of enrollment into a health plan, or explicit record in EHR data.
     """
 
@@ -381,7 +393,7 @@ class Death(Record, CanValidate):
 
 class DeviceExposure(Record, CanValidate):
     """Information about a persons exposure to a foreign physical object or instrument.
-    
+
     This information is used for diagnostic or therapeutic purposes through a mechanism beyond chemical action.
     Devices include implantable objects, medical equipment and supplies,
     other instruments used in medical procedures and material used in clinical care.
@@ -391,7 +403,9 @@ class DeviceExposure(Record, CanValidate):
     person: Person = models.ForeignKey("Person", models.DO_NOTHING)
     device_concept: Concept = models.ForeignKey(Concept, models.DO_NOTHING)
     device_exposure_start_date: datetime = models.DateField()
-    device_exposure_start_datetime: datetime = models.DateTimeField(blank=True, null=True)
+    device_exposure_start_datetime: datetime = models.DateTimeField(
+        blank=True, null=True
+    )
     device_exposure_end_date: datetime = models.DateField(blank=True, null=True)
     device_exposure_end_datetime: datetime = models.DateTimeField(blank=True, null=True)
     device_type_concept: Concept = models.ForeignKey(
@@ -402,7 +416,9 @@ class DeviceExposure(Record, CanValidate):
     unique_device_id: str = models.CharField(max_length=255, blank=True, null=True)
     production_id: str = models.CharField(max_length=255, blank=True, null=True)
     quantity: int = models.IntegerField(blank=True, null=True)
-    provider: Provider = models.ForeignKey("Provider", models.DO_NOTHING, blank=True, null=True)
+    provider: Provider = models.ForeignKey(
+        "Provider", models.DO_NOTHING, blank=True, null=True
+    )
     visit_occurrence: VisitOccurrence = models.ForeignKey(
         "VisitOccurrence", models.DO_NOTHING, blank=True, null=True
     )
@@ -440,9 +456,10 @@ class DeviceExposure(Record, CanValidate):
 
 class Domain(Record, CanValidate):
     """OMOP-defined Domains the Concepts of the Standardized Vocabularies can belong to.
-    
+
     A Domain defines the set of allowable Concepts for the standardized fields in the CDM tables.
     """
+
     domain_id: str = models.CharField(primary_key=True, max_length=20)
     domain_name: str = models.CharField(max_length=255)
     domain_concept: Concept = models.ForeignKey(Concept, models.DO_NOTHING)
@@ -493,7 +510,7 @@ class DrugEra(Record, CanValidate):
 class DrugExposure(Record, CanValidate):
     """Records about the exposure to a Drug ingested or otherwise introduced into the body.
 
-    A Drug is a biochemical substance formulated in such a way that when administered to a Person it will exert a certain biochemical effect on the metabolism. 
+    A Drug is a biochemical substance formulated in such a way that when administered to a Person it will exert a certain biochemical effect on the metabolism.
     Drugs include prescription and over-the-counter medicines, vaccines, and large-molecule biologic therapies.
     Radiological devices ingested or applied locally do not count as Drugs.
     """
@@ -524,7 +541,9 @@ class DrugExposure(Record, CanValidate):
         null=True,
     )
     lot_number: str = models.CharField(max_length=50, blank=True, null=True)
-    provider: Provider = models.ForeignKey("Provider", models.DO_NOTHING, blank=True, null=True)
+    provider: Provider = models.ForeignKey(
+        "Provider", models.DO_NOTHING, blank=True, null=True
+    )
     visit_occurrence: VisitOccurrence = models.ForeignKey(
         "VisitOccurrence", models.DO_NOTHING, blank=True, null=True
     )
@@ -598,8 +617,8 @@ class DrugStrength(Record, CanValidate):
 
 
 class Episode(Record, CanValidate):
-    """Aggregates lower-level clinical events into a higher-level abstraction representing clinically and analytically relevant disease phases, outcomes and treatments. 
-    
+    """Aggregates lower-level clinical events into a higher-level abstraction representing clinically and analytically relevant disease phases, outcomes and treatments.
+
     The EPISODE_EVENT table connects qualifying clinical events (VISIT_OCCURRENCE, DRUG_EXPOSURE, PROCEDURE_OCCURRENCE, DEVICE_EXPOSURE) to the appropriate EPISODE entry.
 
     For example cancers including their development over time, their treatment, and final resolution.
@@ -636,7 +655,7 @@ class Episode(Record, CanValidate):
 
 class EpisodeEvent(Record, CanValidate):
     """The EPISODE_EVENT table connects qualifying clinical events to the appropriate EPISODE entry.
-    
+
     Clinical events include CONDITION_OCCURRENCE, DRUG_EXPOSURE, PROCEDURE_OCCURRENCE, MEASUREMENT.
 
     For example, linking the precise location of the metastasis (cancer modifier in MEASUREMENT) to the disease episode.
@@ -713,9 +732,9 @@ class Measurement(Record, CanValidate):
     """Records of Measurements, i.e. structured values (numerical or categorical) obtained through systematic and standardized examination or testing of a Person or Persons sample.
 
     The MEASUREMENT table contains both orders and results of such Measurements as laboratory tests, vital signs, quantitative findings from pathology reports, etc.
-    Measurements are stored as attribute value pairs, with the attribute as the Measurement Concept and the value representing the result. 
+    Measurements are stored as attribute value pairs, with the attribute as the Measurement Concept and the value representing the result.
     The value can be a Concept (stored in VALUE_AS_CONCEPT), or a numerical value (VALUE_AS_NUMBER) with a Unit (UNIT_CONCEPT_ID).
-    The Procedure for obtaining the sample is housed in the PROCEDURE_OCCURRENCE table, though it is unnecessary to create a PROCEDURE_OCCURRENCE record for each measurement if one does not exist in the source data. 
+    The Procedure for obtaining the sample is housed in the PROCEDURE_OCCURRENCE table, though it is unnecessary to create a PROCEDURE_OCCURRENCE record for each measurement if one does not exist in the source data.
     Measurements differ from Observations in that they require a standardized test or some other activity to generate a quantitative or qualitative result.
     If there is no result, it is assumed that the lab test was conducted but the result was not captured.
     """
@@ -761,14 +780,18 @@ class Measurement(Record, CanValidate):
     range_high: float = models.DecimalField(
         max_digits=1000, decimal_places=1000, blank=True, null=True
     )
-    provider: Provider = models.ForeignKey("Provider", models.DO_NOTHING, blank=True, null=True)
+    provider: Provider = models.ForeignKey(
+        "Provider", models.DO_NOTHING, blank=True, null=True
+    )
     visit_occurrence = models.ForeignKey(
         "VisitOccurrence", models.DO_NOTHING, blank=True, null=True
     )
     visit_detail: VisitDetail = models.ForeignKey(
         "VisitDetail", models.DO_NOTHING, blank=True, null=True
     )
-    measurement_source_value: str = models.CharField(max_length=50, blank=True, null=True)
+    measurement_source_value: str = models.CharField(
+        max_length=50, blank=True, null=True
+    )
     measurement_source_concept: Concept = models.ForeignKey(
         Concept,
         models.DO_NOTHING,
@@ -846,7 +869,9 @@ class Note(Record, CanValidate):
     language_concept: Concept = models.ForeignKey(
         Concept, models.DO_NOTHING, related_name="note_language_concept_set"
     )
-    provider: Provider = models.ForeignKey("Provider", models.DO_NOTHING, blank=True, null=True)
+    provider: Provider = models.ForeignKey(
+        "Provider", models.DO_NOTHING, blank=True, null=True
+    )
     visit_occurrence: VisitOccurrence = models.ForeignKey(
         "VisitOccurrence", models.DO_NOTHING, blank=True, null=True
     )
@@ -946,14 +971,18 @@ class Observation(Record, CanValidate):
         blank=True,
         null=True,
     )
-    provider: Provider = models.ForeignKey("Provider", models.DO_NOTHING, blank=True, null=True)
+    provider: Provider = models.ForeignKey(
+        "Provider", models.DO_NOTHING, blank=True, null=True
+    )
     visit_occurrence: VisitOccurrence = models.ForeignKey(
         "VisitOccurrence", models.DO_NOTHING, blank=True, null=True
     )
     visit_detail: VisitDetail = models.ForeignKey(
         "VisitDetail", models.DO_NOTHING, blank=True, null=True
     )
-    observation_source_value: str = models.CharField(max_length=50, blank=True, null=True)
+    observation_source_value: str = models.CharField(
+        max_length=50, blank=True, null=True
+    )
     observation_source_concept: Concept = models.ForeignKey(
         Concept,
         models.DO_NOTHING,
@@ -979,10 +1008,11 @@ class Observation(Record, CanValidate):
 
 
 class ObservationPeriod(Record, CanValidate):
-    """Records which define spans of time during which two conditions are expected to hold:
-    
+    """Records which define spans of time during which two conditions are expected to hold.
+
     (i) Clinical Events that happened to the Person are recorded in the Event tables, and
-    (ii) absense of records indicate such Events did not occur during this span of time."""
+    (ii) absense of records indicate such Events did not occur during this span of time.
+    """
 
     observation_period_id: int = models.IntegerField(primary_key=True)
     person: Person = models.ForeignKey("Person", models.DO_NOTHING)
@@ -1008,7 +1038,9 @@ class PayerPlanPeriod(Record, CanValidate):
     person: Person = models.ForeignKey("Person", models.DO_NOTHING)
     payer_plan_period_start_date: datetime = models.DateField()
     payer_plan_period_end_date: datetime = models.DateField()
-    payer_concept: Concept = models.ForeignKey(Concept, models.DO_NOTHING, blank=True, null=True)
+    payer_concept: Concept = models.ForeignKey(
+        Concept, models.DO_NOTHING, blank=True, null=True
+    )
     payer_source_value: str = models.CharField(max_length=50, blank=True, null=True)
     payer_source_concept: Concept = models.ForeignKey(
         Concept,
@@ -1055,7 +1087,9 @@ class PayerPlanPeriod(Record, CanValidate):
         blank=True,
         null=True,
     )
-    stop_reason_source_value: str = models.CharField(max_length=50, blank=True, null=True)
+    stop_reason_source_value: str = models.CharField(
+        max_length=50, blank=True, null=True
+    )
     stop_reason_source_concept: Concept = models.ForeignKey(
         Concept,
         models.DO_NOTHING,
@@ -1087,9 +1121,15 @@ class Person(Record, CanValidate):
     ethnicity_concept: Concept = models.ForeignKey(
         Concept, models.DO_NOTHING, related_name="person_ethnicity_concept_set"
     )
-    location: Location = models.ForeignKey(Location, models.DO_NOTHING, blank=True, null=True)
-    provider: Provider = models.ForeignKey("Provider", models.DO_NOTHING, blank=True, null=True)
-    care_site: CareSite = models.ForeignKey(CareSite, models.DO_NOTHING, blank=True, null=True)
+    location: Location = models.ForeignKey(
+        Location, models.DO_NOTHING, blank=True, null=True
+    )
+    provider: Provider = models.ForeignKey(
+        "Provider", models.DO_NOTHING, blank=True, null=True
+    )
+    care_site: CareSite = models.ForeignKey(
+        CareSite, models.DO_NOTHING, blank=True, null=True
+    )
     person_source_value: str = models.CharField(max_length=50, blank=True, null=True)
     gender_source_value: str = models.CharField(max_length=50, blank=True, null=True)
     gender_source_concept: Concept = models.ForeignKey(
@@ -1144,7 +1184,9 @@ class ProcedureOccurrence(Record, CanValidate):
         null=True,
     )
     quantity: int = models.IntegerField(blank=True, null=True)
-    provider: Provider = models.ForeignKey("Provider", models.DO_NOTHING, blank=True, null=True)
+    provider: Provider = models.ForeignKey(
+        "Provider", models.DO_NOTHING, blank=True, null=True
+    )
     visit_occurrence: VisitOccurrence = models.ForeignKey(
         "VisitOccurrence", models.DO_NOTHING, blank=True, null=True
     )
@@ -1179,7 +1221,9 @@ class Provider(Record, CanValidate):
     specialty_concept: Concept = models.ForeignKey(
         Concept, models.DO_NOTHING, blank=True, null=True
     )
-    care_site: CareSite = models.ForeignKey(CareSite, models.DO_NOTHING, blank=True, null=True)
+    care_site: CareSite = models.ForeignKey(
+        CareSite, models.DO_NOTHING, blank=True, null=True
+    )
     year_of_birth: int = models.IntegerField(blank=True, null=True)
     gender_concept: Concept = models.ForeignKey(
         Concept,
@@ -1228,7 +1272,7 @@ class Relationship(Record, CanValidate):
 
 class SourceToConceptMap(Record, CanValidate):
     """The source to concept map table is a legacy data structure within the OMOP Common Data Model.
-    
+
     It is recommended for use in ETL processes to maintain local source codes which are not available as Concepts in the Standardized Vocabularies,
     and to establish mappings for each source code into a Standard Concept as target_concept_ids that can be used to populate the Common Data Model tables.
     The SOURCE_TO_CONCEPT_MAP table is no longer populated with content within the Standardized Vocabularies published to the OMOP community.
@@ -1237,7 +1281,9 @@ class SourceToConceptMap(Record, CanValidate):
     source_code: str = models.CharField(max_length=50)
     source_concept: str = models.ForeignKey(Concept, models.DO_NOTHING)
     source_vocabulary_id: str = models.CharField(max_length=20)
-    source_code_description: str = models.CharField(max_length=255, blank=True, null=True)
+    source_code_description: str = models.CharField(
+        max_length=255, blank=True, null=True
+    )
     target_concept: Concept = models.ForeignKey(
         Concept, models.DO_NOTHING, related_name="sourcetoconceptmap_target_concept_set"
     )
@@ -1289,8 +1335,12 @@ class Specimen(Record, CanValidate):
     specimen_source_id: str = models.CharField(max_length=50, blank=True, null=True)
     specimen_source_value: str = models.CharField(max_length=50, blank=True, null=True)
     unit_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    anatomic_site_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    disease_status_source_value: str = models.CharField(max_length=50, blank=True, null=True)
+    anatomic_site_source_value: str = models.CharField(
+        max_length=50, blank=True, null=True
+    )
+    disease_status_source_value: str = models.CharField(
+        max_length=50, blank=True, null=True
+    )
 
     class Meta:
         managed = True
@@ -1317,9 +1367,15 @@ class VisitDetail(Record, CanValidate):
         models.DO_NOTHING,
         related_name="visitdetail_visit_detail_type_concept_set",
     )
-    provider: Provider = models.ForeignKey(Provider, models.DO_NOTHING, blank=True, null=True)
-    care_site: CareSite = models.ForeignKey(CareSite, models.DO_NOTHING, blank=True, null=True)
-    visit_detail_source_value: str = models.CharField(max_length=50, blank=True, null=True)
+    provider: Provider = models.ForeignKey(
+        Provider, models.DO_NOTHING, blank=True, null=True
+    )
+    care_site: CareSite = models.ForeignKey(
+        CareSite, models.DO_NOTHING, blank=True, null=True
+    )
+    visit_detail_source_value: str = models.CharField(
+        max_length=50, blank=True, null=True
+    )
     visit_detail_source_concept: Concept = models.ForeignKey(
         Concept,
         models.DO_NOTHING,
@@ -1334,8 +1390,12 @@ class VisitDetail(Record, CanValidate):
         blank=True,
         null=True,
     )
-    admitted_from_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    discharged_to_source_value: str = models.CharField(max_length=50, blank=True, null=True)
+    admitted_from_source_value: str = models.CharField(
+        max_length=50, blank=True, null=True
+    )
+    discharged_to_source_value: str = models.CharField(
+        max_length=50, blank=True, null=True
+    )
     discharged_to_concept: Concept = models.ForeignKey(
         Concept,
         models.DO_NOTHING,
@@ -1353,7 +1413,9 @@ class VisitDetail(Record, CanValidate):
         blank=True,
         null=True,
     )
-    visit_occurrence: VisitOccurrence = models.ForeignKey("VisitOccurrence", models.DO_NOTHING)
+    visit_occurrence: VisitOccurrence = models.ForeignKey(
+        "VisitOccurrence", models.DO_NOTHING
+    )
 
     class Meta:
         managed = True
@@ -1381,8 +1443,12 @@ class VisitOccurrence(Record, CanValidate):
         models.DO_NOTHING,
         related_name="visitoccurrence_visit_type_concept_set",
     )
-    provider: Provider = models.ForeignKey(Provider, models.DO_NOTHING, blank=True, null=True)
-    care_site: CareSite = models.ForeignKey(CareSite, models.DO_NOTHING, blank=True, null=True)
+    provider: Provider = models.ForeignKey(
+        Provider, models.DO_NOTHING, blank=True, null=True
+    )
+    care_site: CareSite = models.ForeignKey(
+        CareSite, models.DO_NOTHING, blank=True, null=True
+    )
     visit_source_value: str = models.CharField(max_length=50, blank=True, null=True)
     visit_source_concept: Concept = models.ForeignKey(
         Concept,
@@ -1398,7 +1464,9 @@ class VisitOccurrence(Record, CanValidate):
         blank=True,
         null=True,
     )
-    admitted_from_source_value: str = models.CharField(max_length=50, blank=True, null=True)
+    admitted_from_source_value: str = models.CharField(
+        max_length=50, blank=True, null=True
+    )
     discharged_to_concept: Concept = models.ForeignKey(
         Concept,
         models.DO_NOTHING,
@@ -1406,7 +1474,9 @@ class VisitOccurrence(Record, CanValidate):
         blank=True,
         null=True,
     )
-    discharged_to_source_value: str = models.CharField(max_length=50, blank=True, null=True)
+    discharged_to_source_value: str = models.CharField(
+        max_length=50, blank=True, null=True
+    )
     preceding_visit_occurrence: VisitOccurrence = models.ForeignKey(
         "self", models.DO_NOTHING, blank=True, null=True
     )
@@ -1418,9 +1488,10 @@ class VisitOccurrence(Record, CanValidate):
 
 class Vocabulary(Record, CanValidate):
     """Vocabularies collected from various sources or created de novo by the OMOP community.
-    
+
     Populated with a single record for each Vocabulary source and includes a descriptive name and other associated attributes for the Vocabulary.
     """
+
     vocabulary_id: str = models.CharField(primary_key=True, max_length=20)
     vocabulary_name: str = models.CharField(max_length=255)
     vocabulary_reference: str = models.CharField(max_length=255, blank=True, null=True)
