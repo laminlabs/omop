@@ -1,10 +1,15 @@
-"""OMOP Common Data Model.
+"""OMOP Common Data Model [`source <https://github.com/laminlabs/omop/blob/main/omop/models.py>`__].
 
-Import the package::
+Install and mount `omop` in a new instance:
 
-   import omop
+>>> pip install omop
+>>> lamin init --storage ./test-omop --schema omop
 
-This is the complete API reference:
+Import the package:
+
+>>> import omop
+
+Registries:
 
 .. autosummary::
    :toctree: .
