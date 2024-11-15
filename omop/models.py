@@ -12,10 +12,10 @@ from lnschema_core.fields import (
     IntegerField,
     TextField,
 )
-from lnschema_core.models import CanValidate, Record, TracksRun, TracksUpdates
+from lnschema_core.models import CanCurate, Record, TracksRun, TracksUpdates
 
 
-class CareSite(Record, CanValidate, TracksRun, TracksUpdates):
+class CareSite(Record, CanCurate, TracksRun, TracksUpdates):
     """Uniquely identified healthcare delivery unit or an organizational unit, where healthcare services are provided."""
 
     class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
@@ -35,7 +35,7 @@ class CareSite(Record, CanValidate, TracksRun, TracksUpdates):
     )
 
 
-class CdmSource(Record, CanValidate, TracksRun, TracksUpdates):
+class CdmSource(Record, CanCurate, TracksRun, TracksUpdates):
     """Source database and the process details used to transform the data into the OMOP Common Data Model."""
 
     class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
@@ -56,7 +56,7 @@ class CdmSource(Record, CanValidate, TracksRun, TracksUpdates):
     vocabulary_version: str = CharField(max_length=20)
 
 
-class Cohort(Record, CanValidate, TracksRun, TracksUpdates):
+class Cohort(Record, CanCurate, TracksRun, TracksUpdates):
     """Records of subjects that satisfy a given set of criteria for a duration of time.
 
     The definition of the cohort is contained within the COHORT_DEFINITION table.
@@ -73,7 +73,7 @@ class Cohort(Record, CanValidate, TracksRun, TracksUpdates):
     cohort_end_date: datetime = DateField()
 
 
-class CohortDefinition(Record, CanValidate, TracksRun, TracksUpdates):
+class CohortDefinition(Record, CanCurate, TracksRun, TracksUpdates):
     """Records defining a Cohort derived from the data through the associated description and syntax and upon instantiation (execution of the algorithm) placed into the COHORT table.
 
     Cohorts are a set of subjects that satisfy a given combination of inclusion criteria for a duration of time.
@@ -97,7 +97,7 @@ class CohortDefinition(Record, CanValidate, TracksRun, TracksUpdates):
     cohort_initiation_date = DateField(blank=True, null=True)
 
 
-class Concept(Record, CanValidate, TracksRun, TracksUpdates):
+class Concept(Record, CanCurate, TracksRun, TracksUpdates):
     """The Standardized Vocabularies contain records, or Concepts, that uniquely express clinical information in all domain tables of the CDM.
 
     Concepts are derived from vocabularies, which represent clinical information across a domain (e.g. conditions, drugs, procedures) through the use of codes and associated descriptions.
@@ -122,7 +122,7 @@ class Concept(Record, CanValidate, TracksRun, TracksUpdates):
     invalid_reason: str = CharField(max_length=1, blank=True, null=True)
 
 
-class ConceptAncestor(Record, CanValidate, TracksRun, TracksUpdates):
+class ConceptAncestor(Record, CanCurate, TracksRun, TracksUpdates):
     """Hierarchical relationships between Concepts.
 
     Only direct parent-child relationships between Concepts are stored in the CONCEPT_RELATIONSHIP table.
@@ -145,7 +145,7 @@ class ConceptAncestor(Record, CanValidate, TracksRun, TracksUpdates):
     max_levels_of_separation: int = IntegerField()
 
 
-# class ConceptClass(Record, CanValidate, TracksRun, TracksUpdates):
+# class ConceptClass(Record, CanCurate, TracksRun, TracksUpdates):
 #     """The CONCEPT_CLASS table is a reference table, which includes a list of the classifications used to differentiate Concepts within a given Vocabulary.
 
 #     This reference table is populated with a single record for each Concept Class.
@@ -161,7 +161,7 @@ class ConceptAncestor(Record, CanValidate, TracksRun, TracksUpdates):
 #     )  # introduce a loop
 
 
-class ConceptRelationship(Record, CanValidate, TracksRun, TracksUpdates):
+class ConceptRelationship(Record, CanCurate, TracksRun, TracksUpdates):
     """Records that define direct relationships between any two Concepts and the nature or type of the relationship.
 
     Each type of a relationship is defined in the RELATIONSHIP table.
@@ -185,7 +185,7 @@ class ConceptRelationship(Record, CanValidate, TracksRun, TracksUpdates):
     invalid_reason: str = CharField(max_length=1, blank=True, null=True)
 
 
-class ConceptSynonym(Record, CanValidate, TracksRun, TracksUpdates):
+class ConceptSynonym(Record, CanCurate, TracksRun, TracksUpdates):
     """Alternate names and descriptions for Concepts."""
 
     class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
@@ -198,7 +198,7 @@ class ConceptSynonym(Record, CanValidate, TracksRun, TracksUpdates):
     )
 
 
-class ConditionEra(Record, CanValidate, TracksRun, TracksUpdates):
+class ConditionEra(Record, CanCurate, TracksRun, TracksUpdates):
     """Span of time when the Person is assumed to have a given condition.
 
     Similar to Drug Eras, Condition Eras are chronological periods of Condition Occurrence. Combining individual Condition Occurrences into a single Condition Era serves two purposes:
@@ -220,7 +220,7 @@ class ConditionEra(Record, CanValidate, TracksRun, TracksUpdates):
     condition_occurrence_count: int = IntegerField(blank=True, null=True)
 
 
-class ConditionOccurrence(Record, CanValidate, TracksRun, TracksUpdates):
+class ConditionOccurrence(Record, CanCurate, TracksRun, TracksUpdates):
     """Records of Events of a Person.
 
     These events suggest the presence of a disease or medical condition stated as a diagnosis, a sign,
@@ -270,7 +270,7 @@ class ConditionOccurrence(Record, CanValidate, TracksRun, TracksUpdates):
     condition_status_source_value: str = CharField(max_length=50, blank=True, null=True)
 
 
-class Cost(Record, CanValidate, TracksRun, TracksUpdates):
+class Cost(Record, CanCurate, TracksRun, TracksUpdates):
     """Records containing the cost of any medical event recorded in one of the OMOP clinical event tables.
 
     The event tables include DRUG_EXPOSURE, PROCEDURE_OCCURRENCE, VISIT_OCCURRENCE, VISIT_DETAIL, DEVICE_OCCURRENCE, OBSERVATION or MEASUREMENT.
@@ -345,7 +345,7 @@ class Cost(Record, CanValidate, TracksRun, TracksUpdates):
     drg_source_value: str = CharField(max_length=3, blank=True, null=True)
 
 
-class Death(Record, CanValidate, TracksRun, TracksUpdates):
+class Death(Record, CanCurate, TracksRun, TracksUpdates):
     """Clinical event for how and when a Person dies.
 
     A person can have up to one record if the source system contains evidence about the Death,
@@ -378,7 +378,7 @@ class Death(Record, CanValidate, TracksRun, TracksUpdates):
     )
 
 
-class DeviceExposure(Record, CanValidate, TracksRun, TracksUpdates):
+class DeviceExposure(Record, CanCurate, TracksRun, TracksUpdates):
     """Information about a persons exposure to a foreign physical object or instrument.
 
     This information is used for diagnostic or therapeutic purposes through a mechanism beyond chemical action.
@@ -438,7 +438,7 @@ class DeviceExposure(Record, CanValidate, TracksRun, TracksUpdates):
     )
 
 
-class Domain(Record, CanValidate, TracksRun, TracksUpdates):
+class Domain(Record, CanCurate, TracksRun, TracksUpdates):
     """OMOP-defined Domains the Concepts of the Standardized Vocabularies can belong to.
 
     A Domain defines the set of allowable Concepts for the standardized fields in the CDM tables.
@@ -452,7 +452,7 @@ class Domain(Record, CanValidate, TracksRun, TracksUpdates):
     domain_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
 
 
-class DoseEra(Record, CanValidate, TracksRun, TracksUpdates):
+class DoseEra(Record, CanCurate, TracksRun, TracksUpdates):
     """Span of time when the Person is assumed to be exposed to a constant dose of a specific active ingredient."""
 
     class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
@@ -469,7 +469,7 @@ class DoseEra(Record, CanValidate, TracksRun, TracksUpdates):
     dose_era_end_date: datetime = DateField()
 
 
-class DrugEra(Record, CanValidate, TracksRun, TracksUpdates):
+class DrugEra(Record, CanCurate, TracksRun, TracksUpdates):
     """Span of time when the Person is assumed to be exposed to a particular active ingredient.
 
     A Drug Era is not the same as a Drug Exposure: Exposures are individual records corresponding to the source when Drug was delivered to the Person,
@@ -488,7 +488,7 @@ class DrugEra(Record, CanValidate, TracksRun, TracksUpdates):
     gap_days: int = IntegerField(blank=True, null=True)
 
 
-class DrugExposure(Record, CanValidate, TracksRun, TracksUpdates):
+class DrugExposure(Record, CanCurate, TracksRun, TracksUpdates):
     """Records about the exposure to a Drug ingested or otherwise introduced into the body.
 
     A Drug is a biochemical substance formulated in such a way that when administered to a Person it will exert a certain biochemical effect on the metabolism.
@@ -546,7 +546,7 @@ class DrugExposure(Record, CanValidate, TracksRun, TracksUpdates):
     dose_unit_source_value: str = CharField(max_length=50, blank=True, null=True)
 
 
-class DrugStrength(Record, CanValidate, TracksRun, TracksUpdates):
+class DrugStrength(Record, CanCurate, TracksRun, TracksUpdates):
     """Amount or concentration and associated units of a specific ingredient contained within a particular drug product.
 
     This table is supplemental information to support standardized analysis of drug utilization.
@@ -595,7 +595,7 @@ class DrugStrength(Record, CanValidate, TracksRun, TracksUpdates):
     invalid_reason: str = CharField(max_length=1, blank=True, null=True)
 
 
-class Episode(Record, CanValidate, TracksRun, TracksUpdates):
+class Episode(Record, CanCurate, TracksRun, TracksUpdates):
     """Aggregates lower-level clinical events into a higher-level abstraction representing clinically and analytically relevant disease phases, outcomes and treatments.
 
     The EPISODE_EVENT table connects qualifying clinical events (VISIT_OCCURRENCE, DRUG_EXPOSURE, PROCEDURE_OCCURRENCE, DEVICE_EXPOSURE) to the appropriate EPISODE entry.
@@ -631,7 +631,7 @@ class Episode(Record, CanValidate, TracksRun, TracksUpdates):
     )
 
 
-class EpisodeEvent(Record, CanValidate, TracksRun, TracksUpdates):
+class EpisodeEvent(Record, CanCurate, TracksRun, TracksUpdates):
     """The EPISODE_EVENT table connects qualifying clinical events to the appropriate EPISODE entry.
 
     Clinical events include CONDITION_OCCURRENCE, DRUG_EXPOSURE, PROCEDURE_OCCURRENCE, MEASUREMENT.
@@ -647,7 +647,7 @@ class EpisodeEvent(Record, CanValidate, TracksRun, TracksUpdates):
     episode_event_field_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
 
 
-class FactRelationship(Record, CanValidate, TracksRun, TracksUpdates):
+class FactRelationship(Record, CanCurate, TracksRun, TracksUpdates):
     """Records about the relationships between facts stored as records in any table of the CDM.
 
     Relationships can be defined between facts from the same domain, or different domains.
@@ -677,7 +677,7 @@ class FactRelationship(Record, CanValidate, TracksRun, TracksUpdates):
     )
 
 
-class Location(Record, CanValidate, TracksRun, TracksUpdates):
+class Location(Record, CanCurate, TracksRun, TracksUpdates):
     """Capture physical location or address information of Persons and Care Sites."""
 
     class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
@@ -701,7 +701,7 @@ class Location(Record, CanValidate, TracksRun, TracksUpdates):
     )
 
 
-class Measurement(Record, CanValidate, TracksRun, TracksUpdates):
+class Measurement(Record, CanCurate, TracksRun, TracksUpdates):
     """Records of Measurements, i.e. structured values (numerical or categorical) obtained through systematic and standardized examination or testing of a Person or Persons sample.
 
     The MEASUREMENT table contains both orders and results of such Measurements as laboratory tests, vital signs, quantitative findings from pathology reports, etc.
@@ -792,7 +792,7 @@ class Measurement(Record, CanValidate, TracksRun, TracksUpdates):
     )
 
 
-class Metadata(Record, CanValidate, TracksRun, TracksUpdates):
+class Metadata(Record, CanCurate, TracksRun, TracksUpdates):
     """Metadata information about a dataset that has been transformed to the OMOP Common Data Model."""
 
     class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
@@ -819,7 +819,7 @@ class Metadata(Record, CanValidate, TracksRun, TracksUpdates):
     metadata_datetime: datetime = DateTimeField(blank=True, null=True)
 
 
-class Note(Record, CanValidate, TracksRun, TracksUpdates):
+class Note(Record, CanCurate, TracksRun, TracksUpdates):
     """Unstructured information that was recorded by a provider about a patient in free text notes on a given date."""
 
     class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
@@ -861,7 +861,7 @@ class Note(Record, CanValidate, TracksRun, TracksUpdates):
     )
 
 
-class NoteNlp(Record, CanValidate, TracksRun, TracksUpdates):
+class NoteNlp(Record, CanCurate, TracksRun, TracksUpdates):
     """Encodes all output of NLP on clinical notes. Each row represents a single extracted term from a note."""
 
     class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
@@ -897,7 +897,7 @@ class NoteNlp(Record, CanValidate, TracksRun, TracksUpdates):
     term_modifiers: str = CharField(max_length=2000, blank=True, null=True)
 
 
-class Observation(Record, CanValidate, TracksRun, TracksUpdates):
+class Observation(Record, CanCurate, TracksRun, TracksUpdates):
     """Clinical facts about a Person obtained in the context of examination, questioning or a procedure.
 
     Any data that cannot be represented by any other domains, such as social and lifestyle facts, medical history, family history, etc. are recorded here.
@@ -971,7 +971,7 @@ class Observation(Record, CanValidate, TracksRun, TracksUpdates):
     )
 
 
-class ObservationPeriod(Record, CanValidate, TracksRun, TracksUpdates):
+class ObservationPeriod(Record, CanCurate, TracksRun, TracksUpdates):
     """Records which define spans of time during which two conditions are expected to hold.
 
     (i) Clinical Events that happened to the Person are recorded in the Event tables, and
@@ -988,7 +988,7 @@ class ObservationPeriod(Record, CanValidate, TracksRun, TracksUpdates):
     period_type_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
 
 
-class PayerPlanPeriod(Record, CanValidate, TracksRun, TracksUpdates):
+class PayerPlanPeriod(Record, CanCurate, TracksRun, TracksUpdates):
     """Details of the period of time that a Person is continuously enrolled under a specific health Plan benefit structure from a given Payer.
 
     Each Person receiving healthcare is typically covered by a health benefit plan, which pays for (fully or partially), or directly provides, the care.
@@ -1063,7 +1063,7 @@ class PayerPlanPeriod(Record, CanValidate, TracksRun, TracksUpdates):
     )
 
 
-class Person(Record, CanValidate, TracksRun, TracksUpdates):
+class Person(Record, CanCurate, TracksRun, TracksUpdates):
     """Identity management for all Persons in the database.
 
     Records that uniquely identify each person or patient, and some demographic information.
@@ -1116,7 +1116,7 @@ class Person(Record, CanValidate, TracksRun, TracksUpdates):
     )
 
 
-class ProcedureOccurrence(Record, CanValidate, TracksRun, TracksUpdates):
+class ProcedureOccurrence(Record, CanCurate, TracksRun, TracksUpdates):
     """Records of activities or processes ordered by, or carried out by, a healthcare provider on the patient with a diagnostic or therapeutic purpose."""
 
     class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
@@ -1162,7 +1162,7 @@ class ProcedureOccurrence(Record, CanValidate, TracksRun, TracksUpdates):
     modifier_source_value: str = CharField(max_length=50, blank=True, null=True)
 
 
-class Provider(Record, CanValidate, TracksRun, TracksUpdates):
+class Provider(Record, CanCurate, TracksRun, TracksUpdates):
     """Uniquely identified healthcare providers.
 
     Individuals providing hands-on healthcare to patients, such as physicians, nurses, midwives, physical therapists etc.
@@ -1206,7 +1206,7 @@ class Provider(Record, CanValidate, TracksRun, TracksUpdates):
     )
 
 
-class Relationship(Record, CanValidate, TracksRun, TracksUpdates):
+class Relationship(Record, CanCurate, TracksRun, TracksUpdates):
     """All types of relationships that can be used to associate any two concepts in the CONCEPT_RELATIONSHP table."""
 
     class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
@@ -1220,7 +1220,7 @@ class Relationship(Record, CanValidate, TracksRun, TracksUpdates):
     relationship_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
 
 
-class SourceToConceptMap(Record, CanValidate, TracksRun, TracksUpdates):
+class SourceToConceptMap(Record, CanCurate, TracksRun, TracksUpdates):
     """The source to concept map table is a legacy data structure within the OMOP Common Data Model.
 
     It is recommended for use in ETL processes to maintain local source codes which are not available as Concepts in the Standardized Vocabularies,
@@ -1244,7 +1244,7 @@ class SourceToConceptMap(Record, CanValidate, TracksRun, TracksUpdates):
     invalid_reason: str = CharField(max_length=1, blank=True, null=True)
 
 
-class Specimen(Record, CanValidate, TracksRun, TracksUpdates):
+class Specimen(Record, CanCurate, TracksRun, TracksUpdates):
     """The specimen domain contains the records identifying biological samples from a person."""
 
     class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
@@ -1289,7 +1289,7 @@ class Specimen(Record, CanValidate, TracksRun, TracksUpdates):
     disease_status_source_value: str = CharField(max_length=50, blank=True, null=True)
 
 
-class VisitDetail(Record, CanValidate, TracksRun, TracksUpdates):
+class VisitDetail(Record, CanCurate, TracksRun, TracksUpdates):
     """Optional table used to represents details of each record in the parent VISIT_OCCURRENCE table.
 
     A good example of this would be the movement between units in a hospital during an inpatient stay or claim lines associated with a one insurance claim.
@@ -1351,7 +1351,7 @@ class VisitDetail(Record, CanValidate, TracksRun, TracksUpdates):
     visit_occurrence: VisitOccurrence = ForeignKey("VisitOccurrence", models.DO_NOTHING)
 
 
-class VisitOccurrence(Record, CanValidate, TracksRun, TracksUpdates):
+class VisitOccurrence(Record, CanCurate, TracksRun, TracksUpdates):
     """Events where Persons engage with the healthcare system for a duration of time.
 
     They are often also called Encounters. Visits are defined by a configuration of circumstances under which they occur, such as
@@ -1406,7 +1406,7 @@ class VisitOccurrence(Record, CanValidate, TracksRun, TracksUpdates):
     )
 
 
-class Vocabulary(Record, CanValidate, TracksRun, TracksUpdates):
+class Vocabulary(Record, CanCurate, TracksRun, TracksUpdates):
     """Vocabularies collected from various sources or created de novo by the OMOP community.
 
     Populated with a single record for each Vocabulary source and includes a descriptive name and other associated attributes for the Vocabulary.
