@@ -112,3 +112,4 @@ docs/conf.py
 _docs_tmp*
 testdb/
 OMOP_5.4/
+test-omop/

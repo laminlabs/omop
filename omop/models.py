@@ -1,62 +1,62 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from datetime import datetime  # noqa
 
 from django.db import models
-from lnschema_core.models import CanValidate, Record
+from lnschema_core.fields import (
+    CharField,
+    DateField,
+    DateTimeField,
+    DecimalField,
+    ForeignKey,
+    IntegerField,
+    TextField,
+)
+from lnschema_core.models import CanCurate, Record, TracksRun, TracksUpdates
 
-if TYPE_CHECKING:
-    from datetime import datetime
 
-
-class CareSite(Record, CanValidate):
+class CareSite(Record, CanCurate, TracksRun, TracksUpdates):
     """Uniquely identified healthcare delivery unit or an organizational unit, where healthcare services are provided."""
 
-    care_site_id: int = models.IntegerField(primary_key=True)
-    care_site_name: str | None = models.CharField(max_length=255, blank=True, null=True)
-    place_of_service_concept: Concept | None = models.ForeignKey(
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
+    care_site_id: int = IntegerField(primary_key=True)
+    care_site_name: str | None = CharField(max_length=255, blank=True, null=True)
+    place_of_service_concept: Concept | None = ForeignKey(
         "Concept", models.DO_NOTHING, blank=True, null=True
     )
-    location: Location | None = models.ForeignKey(
+    location: Location | None = ForeignKey(
         "Location", models.DO_NOTHING, blank=True, null=True
     )
-    care_site_source_value: str | None = models.CharField(
+    care_site_source_value: str | None = CharField(max_length=50, blank=True, null=True)
+    place_of_service_source_value: str | None = CharField(
         max_length=50, blank=True, null=True
     )
-    place_of_service_source_value: str | None = models.CharField(
-        max_length=50, blank=True, null=True
-    )
-
-    class Meta:
-        managed = True
-        db_table = "care_site"
 
 
-class CdmSource(Record, CanValidate):
+class CdmSource(Record, CanCurate, TracksRun, TracksUpdates):
     """Source database and the process details used to transform the data into the OMOP Common Data Model."""
 
-    cdm_source_name: str = models.CharField(max_length=255)
-    cdm_source_abbreviation: str = models.CharField(max_length=25)
-    cdm_holder: str = models.CharField(max_length=255)
-    source_description: str | None = models.TextField(blank=True, null=True)
-    source_documentation_reference: str | None = models.CharField(
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
+    cdm_source_name: str = CharField(max_length=255)
+    cdm_source_abbreviation: str = CharField(max_length=25)
+    cdm_holder: str = CharField(max_length=255)
+    source_description: str | None = TextField(blank=True, null=True)
+    source_documentation_reference: str | None = CharField(
         max_length=255, blank=True, null=True
     )
-    cdm_etl_reference: str | None = models.CharField(
-        max_length=255, blank=True, null=True
-    )
-    source_release_date: datetime = models.DateField()
-    cdm_release_date: datetime = models.DateField()
-    cdm_version: str | None = models.CharField(max_length=10, blank=True, null=True)
-    cdm_version_concept: Concept = models.ForeignKey("Concept", models.DO_NOTHING)
-    vocabulary_version: str = models.CharField(max_length=20)
-
-    class Meta:
-        managed = True
-        db_table = "cdm_source"
+    cdm_etl_reference: str | None = CharField(max_length=255, blank=True, null=True)
+    source_release_date: datetime = DateField()
+    cdm_release_date: datetime = DateField()
+    cdm_version: str | None = CharField(max_length=10, blank=True, null=True)
+    cdm_version_concept: Concept = ForeignKey("Concept", models.DO_NOTHING)
+    vocabulary_version: str = CharField(max_length=20)
 
 
-class Cohort(Record, CanValidate):
+class Cohort(Record, CanCurate, TracksRun, TracksUpdates):
     """Records of subjects that satisfy a given set of criteria for a duration of time.
 
     The definition of the cohort is contained within the COHORT_DEFINITION table.
@@ -64,17 +64,16 @@ class Cohort(Record, CanValidate):
     The CDM and Vocabulary tables are all read-only so it is suggested that the COHORT and COHORT_DEFINTION tables are kept in a separate schema to alleviate confusion.
     """
 
-    cohort_definition_id: int = models.IntegerField()
-    subject_id: int = models.IntegerField()
-    cohort_start_date: datetime = models.DateField()
-    cohort_end_date: datetime = models.DateField()
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
 
-    class Meta:
-        managed = True
-        db_table = "cohort"
+    cohort_definition_id: int = IntegerField()
+    subject_id: int = IntegerField()
+    cohort_start_date: datetime = DateField()
+    cohort_end_date: datetime = DateField()
 
 
-class CohortDefinition(Record, CanValidate):
+class CohortDefinition(Record, CanCurate, TracksRun, TracksUpdates):
     """Records defining a Cohort derived from the data through the associated description and syntax and upon instantiation (execution of the algorithm) placed into the COHORT table.
 
     Cohorts are a set of subjects that satisfy a given combination of inclusion criteria for a duration of time.
@@ -82,24 +81,23 @@ class CohortDefinition(Record, CanValidate):
     and can store operational programming code to instantiate the cohort within the OMOP Common Data Model.
     """
 
-    cohort_definition_id: int = models.IntegerField()
-    cohort_definition_name: str = models.CharField(max_length=255)
-    cohort_definition_description: str = models.TextField(blank=True, null=True)
-    definition_type_concept: Concept = models.ForeignKey("Concept", models.DO_NOTHING)
-    cohort_definition_syntax: str = models.TextField(blank=True, null=True)
-    subject_concept: Concept = models.ForeignKey(
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
+    cohort_definition_id: int = IntegerField()
+    cohort_definition_name: str = CharField(max_length=255)
+    cohort_definition_description: str = TextField(blank=True, null=True)
+    definition_type_concept: Concept = ForeignKey("Concept", models.DO_NOTHING)
+    cohort_definition_syntax: str = TextField(blank=True, null=True)
+    subject_concept: Concept = ForeignKey(
         "Concept",
         models.DO_NOTHING,
         related_name="cohortdefinition_subject_concept_set",
     )
-    cohort_initiation_date = models.DateField(blank=True, null=True)
-
-    class Meta:
-        managed = True
-        db_table = "cohort_definition"
+    cohort_initiation_date = DateField(blank=True, null=True)
 
 
-class Concept(Record, CanValidate):
+class Concept(Record, CanCurate, TracksRun, TracksUpdates):
     """The Standardized Vocabularies contain records, or Concepts, that uniquely express clinical information in all domain tables of the CDM.
 
     Concepts are derived from vocabularies, which represent clinical information across a domain (e.g. conditions, drugs, procedures) through the use of codes and associated descriptions.
@@ -109,23 +107,22 @@ class Concept(Record, CanValidate):
     Records in the Standardized Vocabularies tables are derived from national or international vocabularies such as SNOMED-CT, RxNorm, and LOINC, or custom Concepts defined to cover various aspects of observational data analysis.
     """
 
-    concept_id: int = models.IntegerField(primary_key=True)
-    concept_name: str = models.CharField(max_length=255)
-    domain_id: str = models.CharField(max_length=255)
-    vocabulary_id: str = models.CharField(max_length=255)
-    concept_class: str = models.CharField(max_length=255)
-    standard_concept: str = models.CharField(max_length=1, blank=True, null=True)
-    concept_code: str = models.CharField(max_length=50)
-    valid_start_date: datetime = models.DateField()
-    valid_end_date: datetime = models.DateField()
-    invalid_reason: str = models.CharField(max_length=1, blank=True, null=True)
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
 
-    class Meta:
-        managed = True
-        db_table = "concept"
+    concept_id: int = IntegerField(primary_key=True)
+    concept_name: str = CharField(max_length=255)
+    domain_id: str = CharField(max_length=255)
+    vocabulary_id: str = CharField(max_length=255)
+    concept_class: str = CharField(max_length=255)
+    standard_concept: str = CharField(max_length=1, blank=True, null=True)
+    concept_code: str = CharField(max_length=50)
+    valid_start_date: datetime = DateField()
+    valid_end_date: datetime = DateField()
+    invalid_reason: str = CharField(max_length=1, blank=True, null=True)
 
 
-class ConceptAncestor(Record, CanValidate):
+class ConceptAncestor(Record, CanCurate, TracksRun, TracksUpdates):
     """Hierarchical relationships between Concepts.
 
     Only direct parent-child relationships between Concepts are stored in the CONCEPT_RELATIONSHIP table.
@@ -135,75 +132,73 @@ class ConceptAncestor(Record, CanValidate):
     This table is entirely derived from the CONCEPT, CONCEPT_RELATIONSHIP and RELATIONSHIP tables.
     """
 
-    ancestor_concept: Concept = models.ForeignKey(Concept, models.DO_NOTHING)
-    descendant_concept: Concept = models.ForeignKey(
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
+    ancestor_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
+    descendant_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="conceptancestor_descendant_concept_set",
     )
-    min_levels_of_separation: int = models.IntegerField()
-    max_levels_of_separation: int = models.IntegerField()
-
-    class Meta:
-        managed = True
-        db_table = "concept_ancestor"
+    min_levels_of_separation: int = IntegerField()
+    max_levels_of_separation: int = IntegerField()
 
 
-# class ConceptClass(Record):
+# class ConceptClass(Record, CanCurate, TracksRun, TracksUpdates):
 #     """The CONCEPT_CLASS table is a reference table, which includes a list of the classifications used to differentiate Concepts within a given Vocabulary.
 
 #     This reference table is populated with a single record for each Concept Class.
 #     """
 
-#     concept_class_id = models.CharField(primary_key=True, max_length=20)
-#     concept_class_name = models.CharField(max_length=255)
-#     concept_class_concept = models.ForeignKey(Concept, models.DO_NOTHING)  # introduce a loop
+#     class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+#         abstract = False
 
-#     class Meta:
-#         managed = True
-#         db_table = "concept_class"
+#     concept_class_id = CharField(primary_key=True, max_length=20)
+#     concept_class_name = CharField(max_length=255)
+#     concept_class_concept = ForeignKey(
+#         Concept, models.DO_NOTHING
+#     )  # introduce a loop
 
 
-class ConceptRelationship(Record, CanValidate):
+class ConceptRelationship(Record, CanCurate, TracksRun, TracksUpdates):
     """Records that define direct relationships between any two Concepts and the nature or type of the relationship.
 
     Each type of a relationship is defined in the RELATIONSHIP table.
     """
 
-    concept_id_1: Concept = models.ForeignKey(
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
+    concept_id_1: Concept = ForeignKey(
         Concept, models.DO_NOTHING, db_column="concept_id_1"
     )
-    concept_id_2: Concept = models.ForeignKey(
+    concept_id_2: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         db_column="concept_id_2",
         related_name="conceptrelationship_concept_id_2_set",
     )
-    relationship: Relationship = models.ForeignKey("Relationship", models.DO_NOTHING)
-    valid_start_date: datetime = models.DateField()
-    valid_end_date: datetime = models.DateField()
-    invalid_reason: str = models.CharField(max_length=1, blank=True, null=True)
-
-    class Meta:
-        managed = True
-        db_table = "concept_relationship"
+    relationship: Relationship = ForeignKey("Relationship", models.DO_NOTHING)
+    valid_start_date: datetime = DateField()
+    valid_end_date: datetime = DateField()
+    invalid_reason: str = CharField(max_length=1, blank=True, null=True)
 
 
-class ConceptSynonym(Record, CanValidate):
+class ConceptSynonym(Record, CanCurate, TracksRun, TracksUpdates):
     """Alternate names and descriptions for Concepts."""
 
-    concept: Concept = models.ForeignKey(Concept, models.DO_NOTHING)
-    concept_synonym_name: str = models.CharField(max_length=1000)
-    language_concept: Concept = models.ForeignKey(
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
+    concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
+    concept_synonym_name: str = CharField(max_length=1000)
+    language_concept: Concept = ForeignKey(
         Concept, models.DO_NOTHING, related_name="conceptsynonym_language_concept_set"
     )
 
-    class Meta:
-        managed = True
-        db_table = "concept_synonym"
 
-
-class ConditionEra(Record, CanValidate):
+class ConditionEra(Record, CanCurate, TracksRun, TracksUpdates):
     """Span of time when the Person is assumed to have a given condition.
 
     Similar to Drug Eras, Condition Eras are chronological periods of Condition Occurrence. Combining individual Condition Occurrences into a single Condition Era serves two purposes:
@@ -214,171 +209,167 @@ class ConditionEra(Record, CanValidate):
         These two independent doctor visits should be aggregated into one Condition Era.
     """
 
-    condition_era_id: int = models.IntegerField(primary_key=True)
-    person: Person = models.ForeignKey("Person", models.DO_NOTHING)
-    condition_concept: Concept = models.ForeignKey(Concept, models.DO_NOTHING)
-    condition_era_start_date: datetime = models.DateField()
-    condition_era_end_date: datetime = models.DateField()
-    condition_occurrence_count: int = models.IntegerField(blank=True, null=True)
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
 
-    class Meta:
-        managed = True
-        db_table = "condition_era"
+    condition_era_id: int = IntegerField(primary_key=True)
+    person: Person = ForeignKey("Person", models.DO_NOTHING)
+    condition_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
+    condition_era_start_date: datetime = DateField()
+    condition_era_end_date: datetime = DateField()
+    condition_occurrence_count: int = IntegerField(blank=True, null=True)
 
 
-class ConditionOccurrence(Record, CanValidate):
+class ConditionOccurrence(Record, CanCurate, TracksRun, TracksUpdates):
     """Records of Events of a Person.
 
     These events suggest the presence of a disease or medical condition stated as a diagnosis, a sign,
     or a symptom, which is either observed by a Provider or reported by the patient.
     """
 
-    condition_occurrence_id: int = models.IntegerField(primary_key=True)
-    person: Person = models.ForeignKey("Person", models.DO_NOTHING)
-    condition_concept: Concept = models.ForeignKey(Concept, models.DO_NOTHING)
-    condition_start_date: datetime = models.DateField()
-    condition_start_datetime: datetime = models.DateTimeField(blank=True, null=True)
-    condition_end_date: datetime = models.DateField(blank=True, null=True)
-    condition_end_datetime: datetime = models.DateTimeField(blank=True, null=True)
-    condition_type_concept: Concept = models.ForeignKey(
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
+    condition_occurrence_id: int = IntegerField(primary_key=True)
+    person: Person = ForeignKey("Person", models.DO_NOTHING)
+    condition_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
+    condition_start_date: datetime = DateField()
+    condition_start_datetime: datetime = DateTimeField(blank=True, null=True)
+    condition_end_date: datetime = DateField(blank=True, null=True)
+    condition_end_datetime: datetime = DateTimeField(blank=True, null=True)
+    condition_type_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="conditionoccurrence_condition_type_concept_set",
     )
-    condition_status_concept: Concept = models.ForeignKey(
+    condition_status_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="conditionoccurrence_condition_status_concept_set",
         blank=True,
         null=True,
     )
-    stop_reason: str = models.CharField(max_length=20, blank=True, null=True)
-    provider: Provider = models.ForeignKey(
+    stop_reason: str = CharField(max_length=20, blank=True, null=True)
+    provider: Provider = ForeignKey(
         "Provider", models.DO_NOTHING, blank=True, null=True
     )
-    visit_occurrence: VisitOccurrence = models.ForeignKey(
+    visit_occurrence: VisitOccurrence = ForeignKey(
         "VisitOccurrence", models.DO_NOTHING, blank=True, null=True
     )
-    visit_detail: VisitDetail = models.ForeignKey(
+    visit_detail: VisitDetail = ForeignKey(
         "VisitDetail", models.DO_NOTHING, blank=True, null=True
     )
-    condition_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    condition_source_concept: Concept = models.ForeignKey(
+    condition_source_value: str = CharField(max_length=50, blank=True, null=True)
+    condition_source_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="conditionoccurrence_condition_source_concept_set",
         blank=True,
         null=True,
     )
-    condition_status_source_value: str = models.CharField(
-        max_length=50, blank=True, null=True
-    )
-
-    class Meta:
-        managed = True
-        db_table = "condition_occurrence"
+    condition_status_source_value: str = CharField(max_length=50, blank=True, null=True)
 
 
-class Cost(Record, CanValidate):
+class Cost(Record, CanCurate, TracksRun, TracksUpdates):
     """Records containing the cost of any medical event recorded in one of the OMOP clinical event tables.
 
     The event tables include DRUG_EXPOSURE, PROCEDURE_OCCURRENCE, VISIT_OCCURRENCE, VISIT_DETAIL, DEVICE_OCCURRENCE, OBSERVATION or MEASUREMENT.
     """
 
-    cost_id: int = models.IntegerField(primary_key=True)
-    cost_event_id: int = models.IntegerField()
-    cost_domain: Domain = models.ForeignKey("Domain", models.DO_NOTHING)
-    cost_type_concept: Concept = models.ForeignKey(Concept, models.DO_NOTHING)
-    currency_concept: Concept = models.ForeignKey(
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
+    cost_id: int = IntegerField(primary_key=True)
+    cost_event_id: int = IntegerField()
+    cost_domain: Domain = ForeignKey("Domain", models.DO_NOTHING)
+    cost_type_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
+    currency_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="cost_currency_concept_set",
         blank=True,
         null=True,
     )
-    total_charge: int = models.DecimalField(
+    total_charge: int = DecimalField(
         max_digits=1000, decimal_places=1000, blank=True, null=True
     )
-    total_cost: float = models.DecimalField(
+    total_cost: float = DecimalField(
         max_digits=1000, decimal_places=1000, blank=True, null=True
     )
-    total_paid: float = models.DecimalField(
+    total_paid: float = DecimalField(
         max_digits=1000, decimal_places=1000, blank=True, null=True
     )
-    paid_by_payer: float = models.DecimalField(
+    paid_by_payer: float = DecimalField(
         max_digits=1000, decimal_places=1000, blank=True, null=True
     )
-    paid_by_patient: float = models.DecimalField(
+    paid_by_patient: float = DecimalField(
         max_digits=1000, decimal_places=1000, blank=True, null=True
     )
-    paid_patient_copay: float = models.DecimalField(
+    paid_patient_copay: float = DecimalField(
         max_digits=1000, decimal_places=1000, blank=True, null=True
     )
-    paid_patient_coinsurance: float = models.DecimalField(
+    paid_patient_coinsurance: float = DecimalField(
         max_digits=1000, decimal_places=1000, blank=True, null=True
     )
-    paid_patient_deductible: float = models.DecimalField(
+    paid_patient_deductible: float = DecimalField(
         max_digits=1000, decimal_places=1000, blank=True, null=True
     )
-    paid_by_primary: float = models.DecimalField(
+    paid_by_primary: float = DecimalField(
         max_digits=1000, decimal_places=1000, blank=True, null=True
     )
-    paid_ingredient_cost: float = models.DecimalField(
+    paid_ingredient_cost: float = DecimalField(
         max_digits=1000, decimal_places=1000, blank=True, null=True
     )
-    paid_dispensing_fee: float = models.DecimalField(
+    paid_dispensing_fee: float = DecimalField(
         max_digits=1000, decimal_places=1000, blank=True, null=True
     )
-    payer_plan_period_id: float = models.IntegerField(blank=True, null=True)
-    amount_allowed = models.DecimalField(
+    payer_plan_period_id: float = IntegerField(blank=True, null=True)
+    amount_allowed = DecimalField(
         max_digits=1000, decimal_places=1000, blank=True, null=True
     )
-    revenue_code_concept: Concept = models.ForeignKey(
+    revenue_code_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="cost_revenue_code_concept_set",
         blank=True,
         null=True,
     )
-    revenue_code_source_value: str = models.CharField(
-        max_length=50, blank=True, null=True
-    )
-    drg_concept: Concept = models.ForeignKey(
+    revenue_code_source_value: str = CharField(max_length=50, blank=True, null=True)
+    drg_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="cost_drg_concept_set",
         blank=True,
         null=True,
     )
-    drg_source_value: str = models.CharField(max_length=3, blank=True, null=True)
-
-    class Meta:
-        managed = True
-        db_table = "cost"
+    drg_source_value: str = CharField(max_length=3, blank=True, null=True)
 
 
-class Death(Record, CanValidate):
+class Death(Record, CanCurate, TracksRun, TracksUpdates):
     """Clinical event for how and when a Person dies.
 
     A person can have up to one record if the source system contains evidence about the Death,
     such as: Condition in an administrative claim, status of enrollment into a health plan, or explicit record in EHR data.
     """
 
-    person: Person = models.ForeignKey("Person", models.DO_NOTHING)
-    death_date: datetime = models.DateField()
-    death_datetime: datetime = models.DateTimeField(blank=True, null=True)
-    death_type_concept: Concept = models.ForeignKey(
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
+    person: Person = ForeignKey("Person", models.DO_NOTHING)
+    death_date: datetime = DateField()
+    death_datetime: datetime = DateTimeField(blank=True, null=True)
+    death_type_concept: Concept = ForeignKey(
         Concept, models.DO_NOTHING, blank=True, null=True
     )
-    cause_concept: Concept = models.ForeignKey(
+    cause_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="death_cause_concept_set",
         blank=True,
         null=True,
     )
-    cause_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    cause_source_concept: Concept = models.ForeignKey(
+    cause_source_value: str = CharField(max_length=50, blank=True, null=True)
+    cause_source_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="death_cause_source_concept_set",
@@ -386,12 +377,8 @@ class Death(Record, CanValidate):
         null=True,
     )
 
-    class Meta:
-        managed = True
-        db_table = "death"
 
-
-class DeviceExposure(Record, CanValidate):
+class DeviceExposure(Record, CanCurate, TracksRun, TracksUpdates):
     """Information about a persons exposure to a foreign physical object or instrument.
 
     This information is used for diagnostic or therapeutic purposes through a mechanism beyond chemical action.
@@ -399,49 +386,50 @@ class DeviceExposure(Record, CanValidate):
     other instruments used in medical procedures and material used in clinical care.
     """
 
-    device_exposure_id: int = models.IntegerField(primary_key=True)
-    person: Person = models.ForeignKey("Person", models.DO_NOTHING)
-    device_concept: Concept = models.ForeignKey(Concept, models.DO_NOTHING)
-    device_exposure_start_date: datetime = models.DateField()
-    device_exposure_start_datetime: datetime = models.DateTimeField(
-        blank=True, null=True
-    )
-    device_exposure_end_date: datetime = models.DateField(blank=True, null=True)
-    device_exposure_end_datetime: datetime = models.DateTimeField(blank=True, null=True)
-    device_type_concept: Concept = models.ForeignKey(
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
+    device_exposure_id: int = IntegerField(primary_key=True)
+    person: Person = ForeignKey("Person", models.DO_NOTHING)
+    device_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
+    device_exposure_start_date: datetime = DateField()
+    device_exposure_start_datetime: datetime = DateTimeField(blank=True, null=True)
+    device_exposure_end_date: datetime = DateField(blank=True, null=True)
+    device_exposure_end_datetime: datetime = DateTimeField(blank=True, null=True)
+    device_type_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="deviceexposure_device_type_concept_set",
     )
-    unique_device_id: str = models.CharField(max_length=255, blank=True, null=True)
-    production_id: str = models.CharField(max_length=255, blank=True, null=True)
-    quantity: int = models.IntegerField(blank=True, null=True)
-    provider: Provider = models.ForeignKey(
+    unique_device_id: str = CharField(max_length=255, blank=True, null=True)
+    production_id: str = CharField(max_length=255, blank=True, null=True)
+    quantity: int = IntegerField(blank=True, null=True)
+    provider: Provider = ForeignKey(
         "Provider", models.DO_NOTHING, blank=True, null=True
     )
-    visit_occurrence: VisitOccurrence = models.ForeignKey(
+    visit_occurrence: VisitOccurrence = ForeignKey(
         "VisitOccurrence", models.DO_NOTHING, blank=True, null=True
     )
-    visit_detail: VisitDetail = models.ForeignKey(
+    visit_detail: VisitDetail = ForeignKey(
         "VisitDetail", models.DO_NOTHING, blank=True, null=True
     )
-    device_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    device_source_concept: Concept = models.ForeignKey(
+    device_source_value: str = CharField(max_length=50, blank=True, null=True)
+    device_source_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="deviceexposure_device_source_concept_set",
         blank=True,
         null=True,
     )
-    unit_concept: Concept = models.ForeignKey(
+    unit_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="deviceexposure_unit_concept_set",
         blank=True,
         null=True,
     )
-    unit_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    unit_source_concept: Concept = models.ForeignKey(
+    unit_source_value: str = CharField(max_length=50, blank=True, null=True)
+    unit_source_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="deviceexposure_unit_source_concept_set",
@@ -449,65 +437,58 @@ class DeviceExposure(Record, CanValidate):
         null=True,
     )
 
-    class Meta:
-        managed = True
-        db_table = "device_exposure"
 
-
-class Domain(Record, CanValidate):
+class Domain(Record, CanCurate, TracksRun, TracksUpdates):
     """OMOP-defined Domains the Concepts of the Standardized Vocabularies can belong to.
 
     A Domain defines the set of allowable Concepts for the standardized fields in the CDM tables.
     """
 
-    domain_id: str = models.CharField(primary_key=True, max_length=20)
-    domain_name: str = models.CharField(max_length=255)
-    domain_concept: Concept = models.ForeignKey(Concept, models.DO_NOTHING)
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
 
-    class Meta:
-        managed = True
-        db_table = "domain"
+    domain_id: str = CharField(primary_key=True, max_length=20)
+    domain_name: str = CharField(max_length=255)
+    domain_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
 
 
-class DoseEra(Record, CanValidate):
+class DoseEra(Record, CanCurate, TracksRun, TracksUpdates):
     """Span of time when the Person is assumed to be exposed to a constant dose of a specific active ingredient."""
 
-    dose_era_id: int = models.IntegerField(primary_key=True)
-    person: Person = models.ForeignKey("Person", models.DO_NOTHING)
-    drug_concept: Concept = models.ForeignKey(Concept, models.DO_NOTHING)
-    unit_concept: Concept = models.ForeignKey(
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
+    dose_era_id: int = IntegerField(primary_key=True)
+    person: Person = ForeignKey("Person", models.DO_NOTHING)
+    drug_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
+    unit_concept: Concept = ForeignKey(
         Concept, models.DO_NOTHING, related_name="doseera_unit_concept_set"
     )
-    dose_value: float = models.DecimalField(max_digits=1000, decimal_places=1000)
-    dose_era_start_date: datetime = models.DateField()
-    dose_era_end_date: datetime = models.DateField()
-
-    class Meta:
-        managed = True
-        db_table = "dose_era"
+    dose_value: float = DecimalField(max_digits=1000, decimal_places=1000)
+    dose_era_start_date: datetime = DateField()
+    dose_era_end_date: datetime = DateField()
 
 
-class DrugEra(Record, CanValidate):
+class DrugEra(Record, CanCurate, TracksRun, TracksUpdates):
     """Span of time when the Person is assumed to be exposed to a particular active ingredient.
 
     A Drug Era is not the same as a Drug Exposure: Exposures are individual records corresponding to the source when Drug was delivered to the Person,
     while successive periods of Drug Exposures are combined under certain rules to produce continuous Drug Eras.
     """
 
-    drug_era_id: int = models.IntegerField(primary_key=True)
-    person: Person = models.ForeignKey("Person", models.DO_NOTHING)
-    drug_concept: Concept = models.ForeignKey(Concept, models.DO_NOTHING)
-    drug_era_start_date: datetime = models.DateField()
-    drug_era_end_date: datetime = models.DateField()
-    drug_exposure_count: int = models.IntegerField(blank=True, null=True)
-    gap_days: int = models.IntegerField(blank=True, null=True)
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
 
-    class Meta:
-        managed = True
-        db_table = "drug_era"
+    drug_era_id: int = IntegerField(primary_key=True)
+    person: Person = ForeignKey("Person", models.DO_NOTHING)
+    drug_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
+    drug_era_start_date: datetime = DateField()
+    drug_era_end_date: datetime = DateField()
+    drug_exposure_count: int = IntegerField(blank=True, null=True)
+    gap_days: int = IntegerField(blank=True, null=True)
 
 
-class DrugExposure(Record, CanValidate):
+class DrugExposure(Record, CanCurate, TracksRun, TracksUpdates):
     """Records about the exposure to a Drug ingested or otherwise introduced into the body.
 
     A Drug is a biochemical substance formulated in such a way that when administered to a Person it will exert a certain biochemical effect on the metabolism.
@@ -515,108 +496,106 @@ class DrugExposure(Record, CanValidate):
     Radiological devices ingested or applied locally do not count as Drugs.
     """
 
-    drug_exposure_id: int = models.IntegerField(primary_key=True)
-    person: Person = models.ForeignKey("Person", models.DO_NOTHING)
-    drug_concept: Concept = models.ForeignKey(Concept, models.DO_NOTHING)
-    drug_exposure_start_date: datetime = models.DateField()
-    drug_exposure_start_datetime: datetime = models.DateTimeField(blank=True, null=True)
-    drug_exposure_end_date: datetime = models.DateField()
-    drug_exposure_end_datetime: datetime = models.DateTimeField(blank=True, null=True)
-    verbatim_end_date: datetime = models.DateField(blank=True, null=True)
-    drug_type_concept: Concept = models.ForeignKey(
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
+    drug_exposure_id: int = IntegerField(primary_key=True)
+    person: Person = ForeignKey("Person", models.DO_NOTHING)
+    drug_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
+    drug_exposure_start_date: datetime = DateField()
+    drug_exposure_start_datetime: datetime = DateTimeField(blank=True, null=True)
+    drug_exposure_end_date: datetime = DateField()
+    drug_exposure_end_datetime: datetime = DateTimeField(blank=True, null=True)
+    verbatim_end_date: datetime = DateField(blank=True, null=True)
+    drug_type_concept: Concept = ForeignKey(
         Concept, models.DO_NOTHING, related_name="drugexposure_drug_type_concept_set"
     )
-    stop_reason: str = models.CharField(max_length=20, blank=True, null=True)
-    refills: int = models.IntegerField(blank=True, null=True)
-    quantity: float = models.DecimalField(
+    stop_reason: str = CharField(max_length=20, blank=True, null=True)
+    refills: int = IntegerField(blank=True, null=True)
+    quantity: float = DecimalField(
         max_digits=1000, decimal_places=1000, blank=True, null=True
     )
-    days_supply: int = models.IntegerField(blank=True, null=True)
-    sig: str = models.TextField(blank=True, null=True)
-    route_concept: Concept = models.ForeignKey(
+    days_supply: int = IntegerField(blank=True, null=True)
+    sig: str = TextField(blank=True, null=True)
+    route_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="drugexposure_route_concept_set",
         blank=True,
         null=True,
     )
-    lot_number: str = models.CharField(max_length=50, blank=True, null=True)
-    provider: Provider = models.ForeignKey(
+    lot_number: str = CharField(max_length=50, blank=True, null=True)
+    provider: Provider = ForeignKey(
         "Provider", models.DO_NOTHING, blank=True, null=True
     )
-    visit_occurrence: VisitOccurrence = models.ForeignKey(
+    visit_occurrence: VisitOccurrence = ForeignKey(
         "VisitOccurrence", models.DO_NOTHING, blank=True, null=True
     )
-    visit_detail: VisitDetail = models.ForeignKey(
+    visit_detail: VisitDetail = ForeignKey(
         "VisitDetail", models.DO_NOTHING, blank=True, null=True
     )
-    drug_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    drug_source_concept: Concept = models.ForeignKey(
+    drug_source_value: str = CharField(max_length=50, blank=True, null=True)
+    drug_source_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="drugexposure_drug_source_concept_set",
         blank=True,
         null=True,
     )
-    route_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    dose_unit_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-
-    class Meta:
-        managed = True
-        db_table = "drug_exposure"
+    route_source_value: str = CharField(max_length=50, blank=True, null=True)
+    dose_unit_source_value: str = CharField(max_length=50, blank=True, null=True)
 
 
-class DrugStrength(Record, CanValidate):
+class DrugStrength(Record, CanCurate, TracksRun, TracksUpdates):
     """Amount or concentration and associated units of a specific ingredient contained within a particular drug product.
 
     This table is supplemental information to support standardized analysis of drug utilization.
     """
 
-    drug_concept: Concept = models.ForeignKey(Concept, models.DO_NOTHING)
-    ingredient_concept: Concept = models.ForeignKey(
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
+    drug_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
+    ingredient_concept: Concept = ForeignKey(
         Concept, models.DO_NOTHING, related_name="drugstrength_ingredient_concept_set"
     )
-    amount_value: float = models.DecimalField(
+    amount_value: float = DecimalField(
         max_digits=1000, decimal_places=1000, blank=True, null=True
     )
-    amount_unit_concept: Concept = models.ForeignKey(
+    amount_unit_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="drugstrength_amount_unit_concept_set",
         blank=True,
         null=True,
     )
-    numerator_value: float = models.DecimalField(
+    numerator_value: float = DecimalField(
         max_digits=1000, decimal_places=1000, blank=True, null=True
     )
-    numerator_unit_concept: Concept = models.ForeignKey(
+    numerator_unit_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="drugstrength_numerator_unit_concept_set",
         blank=True,
         null=True,
     )
-    denominator_value: float = models.DecimalField(
+    denominator_value: float = DecimalField(
         max_digits=1000, decimal_places=1000, blank=True, null=True
     )
-    denominator_unit_concept: Concept = models.ForeignKey(
+    denominator_unit_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="drugstrength_denominator_unit_concept_set",
         blank=True,
         null=True,
     )
-    box_size: int = models.IntegerField(blank=True, null=True)
-    valid_start_date: datetime = models.DateField()
-    valid_end_date: datetime = models.DateField()
-    invalid_reason: str = models.CharField(max_length=1, blank=True, null=True)
-
-    class Meta:
-        managed = True
-        db_table = "drug_strength"
+    box_size: int = IntegerField(blank=True, null=True)
+    valid_start_date: datetime = DateField()
+    valid_end_date: datetime = DateField()
+    invalid_reason: str = CharField(max_length=1, blank=True, null=True)
 
 
-class Episode(Record, CanValidate):
+class Episode(Record, CanCurate, TracksRun, TracksUpdates):
     """Aggregates lower-level clinical events into a higher-level abstraction representing clinically and analytically relevant disease phases, outcomes and treatments.
 
     The EPISODE_EVENT table connects qualifying clinical events (VISIT_OCCURRENCE, DRUG_EXPOSURE, PROCEDURE_OCCURRENCE, DEVICE_EXPOSURE) to the appropriate EPISODE entry.
@@ -624,23 +603,26 @@ class Episode(Record, CanValidate):
     For example cancers including their development over time, their treatment, and final resolution.
     """
 
-    episode_id: int = models.IntegerField(primary_key=True)
-    person: Person = models.ForeignKey("Person", models.DO_NOTHING)
-    episode_concept: Concept = models.ForeignKey(Concept, models.DO_NOTHING)
-    episode_start_date: datetime = models.DateField()
-    episode_start_datetime: datetime = models.DateTimeField(blank=True, null=True)
-    episode_end_date: datetime = models.DateField(blank=True, null=True)
-    episode_end_datetime: datetime = models.DateTimeField(blank=True, null=True)
-    episode_parent_id: int = models.IntegerField(blank=True, null=True)
-    episode_number: int = models.IntegerField(blank=True, null=True)
-    episode_object_concept: Concept = models.ForeignKey(
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
+    episode_id: int = IntegerField(primary_key=True)
+    person: Person = ForeignKey("Person", models.DO_NOTHING)
+    episode_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
+    episode_start_date: datetime = DateField()
+    episode_start_datetime: datetime = DateTimeField(blank=True, null=True)
+    episode_end_date: datetime = DateField(blank=True, null=True)
+    episode_end_datetime: datetime = DateTimeField(blank=True, null=True)
+    episode_parent_id: int = IntegerField(blank=True, null=True)
+    episode_number: int = IntegerField(blank=True, null=True)
+    episode_object_concept: Concept = ForeignKey(
         Concept, models.DO_NOTHING, related_name="episode_episode_object_concept_set"
     )
-    episode_type_concept: Concept = models.ForeignKey(
+    episode_type_concept: Concept = ForeignKey(
         Concept, models.DO_NOTHING, related_name="episode_episode_type_concept_set"
     )
-    episode_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    episode_source_concept: Concept = models.ForeignKey(
+    episode_source_value: str = CharField(max_length=50, blank=True, null=True)
+    episode_source_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="episode_episode_source_concept_set",
@@ -648,12 +630,8 @@ class Episode(Record, CanValidate):
         null=True,
     )
 
-    class Meta:
-        managed = True
-        db_table = "episode"
 
-
-class EpisodeEvent(Record, CanValidate):
+class EpisodeEvent(Record, CanCurate, TracksRun, TracksUpdates):
     """The EPISODE_EVENT table connects qualifying clinical events to the appropriate EPISODE entry.
 
     Clinical events include CONDITION_OCCURRENCE, DRUG_EXPOSURE, PROCEDURE_OCCURRENCE, MEASUREMENT.
@@ -661,16 +639,15 @@ class EpisodeEvent(Record, CanValidate):
     For example, linking the precise location of the metastasis (cancer modifier in MEASUREMENT) to the disease episode.
     """
 
-    episode: Episode = models.ForeignKey(Episode, models.DO_NOTHING)
-    event_id: int = models.IntegerField()
-    episode_event_field_concept: Concept = models.ForeignKey(Concept, models.DO_NOTHING)
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
 
-    class Meta:
-        managed = True
-        db_table = "episode_event"
+    episode: Episode = ForeignKey(Episode, models.DO_NOTHING)
+    event_id: int = IntegerField()
+    episode_event_field_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
 
 
-class FactRelationship(Record, CanValidate):
+class FactRelationship(Record, CanCurate, TracksRun, TracksUpdates):
     """Records about the relationships between facts stored as records in any table of the CDM.
 
     Relationships can be defined between facts from the same domain, or different domains.
@@ -679,56 +656,52 @@ class FactRelationship(Record, CanValidate):
     or facts derived from one another (measurements derived from an associated specimen).
     """
 
-    domain_concept_id_1: Concept = models.ForeignKey(
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
+    domain_concept_id_1: Concept = ForeignKey(
         Concept, models.DO_NOTHING, db_column="domain_concept_id_1"
     )
-    fact_id_1: int = models.IntegerField()
-    domain_concept_id_2: Concept = models.ForeignKey(
+    fact_id_1: int = IntegerField()
+    domain_concept_id_2: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         db_column="domain_concept_id_2",
         related_name="factrelationship_domain_concept_id_2_set",
     )
-    fact_id_2: int = models.IntegerField()
-    relationship_concept: Concept = models.ForeignKey(
+    fact_id_2: int = IntegerField()
+    relationship_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="factrelationship_relationship_concept_set",
     )
 
-    class Meta:
-        managed = True
-        db_table = "fact_relationship"
 
-
-class Location(Record, CanValidate):
+class Location(Record, CanCurate, TracksRun, TracksUpdates):
     """Capture physical location or address information of Persons and Care Sites."""
 
-    location_id: int = models.IntegerField(primary_key=True)
-    address_1: str = models.CharField(max_length=50, blank=True, null=True)
-    address_2: str = models.CharField(max_length=50, blank=True, null=True)
-    city: str = models.CharField(max_length=50, blank=True, null=True)
-    state: str = models.CharField(max_length=2, blank=True, null=True)
-    zip: str = models.CharField(max_length=9, blank=True, null=True)
-    county: str = models.CharField(max_length=20, blank=True, null=True)
-    location_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    country_concept: Concept = models.ForeignKey(
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
+    location_id: int = IntegerField(primary_key=True)
+    address_1: str = CharField(max_length=50, blank=True, null=True)
+    address_2: str = CharField(max_length=50, blank=True, null=True)
+    city: str = CharField(max_length=50, blank=True, null=True)
+    state: str = CharField(max_length=2, blank=True, null=True)
+    zip: str = CharField(max_length=9, blank=True, null=True)
+    county: str = CharField(max_length=20, blank=True, null=True)
+    location_source_value: str = CharField(max_length=50, blank=True, null=True)
+    country_concept: Concept = ForeignKey(
         Concept, models.DO_NOTHING, blank=True, null=True
     )
-    country_source_value: str = models.CharField(max_length=80, blank=True, null=True)
-    latitude = models.DecimalField(
+    country_source_value: str = CharField(max_length=80, blank=True, null=True)
+    latitude = DecimalField(max_digits=1000, decimal_places=1000, blank=True, null=True)
+    longitude: str = DecimalField(
         max_digits=1000, decimal_places=1000, blank=True, null=True
     )
-    longitude: str = models.DecimalField(
-        max_digits=1000, decimal_places=1000, blank=True, null=True
-    )
-
-    class Meta:
-        managed = True
-        db_table = "location"
 
 
-class Measurement(Record, CanValidate):
+class Measurement(Record, CanCurate, TracksRun, TracksUpdates):
     """Records of Measurements, i.e. structured values (numerical or categorical) obtained through systematic and standardized examination or testing of a Person or Persons sample.
 
     The MEASUREMENT table contains both orders and results of such Measurements as laboratory tests, vital signs, quantitative findings from pathology reports, etc.
@@ -739,77 +712,78 @@ class Measurement(Record, CanValidate):
     If there is no result, it is assumed that the lab test was conducted but the result was not captured.
     """
 
-    measurement_id: int = models.IntegerField(primary_key=True)
-    person: Person = models.ForeignKey("Person", models.DO_NOTHING)
-    measurement_concept: Concept = models.ForeignKey(Concept, models.DO_NOTHING)
-    measurement_date: datetime = models.DateField()
-    measurement_datetime: datetime = models.DateTimeField(blank=True, null=True)
-    measurement_time: str = models.CharField(max_length=10, blank=True, null=True)
-    measurement_type_concept: Concept = models.ForeignKey(
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
+    measurement_id: int = IntegerField(primary_key=True)
+    person: Person = ForeignKey("Person", models.DO_NOTHING)
+    measurement_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
+    measurement_date: datetime = DateField()
+    measurement_datetime: datetime = DateTimeField(blank=True, null=True)
+    measurement_time: str = CharField(max_length=10, blank=True, null=True)
+    measurement_type_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="measurement_measurement_type_concept_set",
     )
-    operator_concept: Concept = models.ForeignKey(
+    operator_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="measurement_operator_concept_set",
         blank=True,
         null=True,
     )
-    value_as_number: float = models.DecimalField(
+    value_as_number: float = DecimalField(
         max_digits=1000, decimal_places=1000, blank=True, null=True
     )
-    value_as_concept: Concept = models.ForeignKey(
+    value_as_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="measurement_value_as_concept_set",
         blank=True,
         null=True,
     )
-    unit_concept: Concept = models.ForeignKey(
+    unit_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="measurement_unit_concept_set",
         blank=True,
         null=True,
     )
-    range_low: float = models.DecimalField(
+    range_low: float = DecimalField(
         max_digits=1000, decimal_places=1000, blank=True, null=True
     )
-    range_high: float = models.DecimalField(
+    range_high: float = DecimalField(
         max_digits=1000, decimal_places=1000, blank=True, null=True
     )
-    provider: Provider = models.ForeignKey(
+    provider: Provider = ForeignKey(
         "Provider", models.DO_NOTHING, blank=True, null=True
     )
-    visit_occurrence = models.ForeignKey(
+    visit_occurrence = ForeignKey(
         "VisitOccurrence", models.DO_NOTHING, blank=True, null=True
     )
-    visit_detail: VisitDetail = models.ForeignKey(
+    visit_detail: VisitDetail = ForeignKey(
         "VisitDetail", models.DO_NOTHING, blank=True, null=True
     )
-    measurement_source_value: str = models.CharField(
-        max_length=50, blank=True, null=True
-    )
-    measurement_source_concept: Concept = models.ForeignKey(
+    measurement_source_value: str = CharField(max_length=50, blank=True, null=True)
+    measurement_source_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="measurement_measurement_source_concept_set",
         blank=True,
         null=True,
     )
-    unit_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    unit_source_concept: Concept = models.ForeignKey(
+    unit_source_value: str = CharField(max_length=50, blank=True, null=True)
+    unit_source_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="measurement_unit_source_concept_set",
         blank=True,
         null=True,
     )
-    value_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    measurement_event_id: int = models.IntegerField(blank=True, null=True)
-    meas_event_field_concept: Concept = models.ForeignKey(
+    value_source_value: str = CharField(max_length=50, blank=True, null=True)
+    measurement_event_id: int = IntegerField(blank=True, null=True)
+    meas_event_field_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="measurement_meas_event_field_concept_set",
@@ -817,70 +791,68 @@ class Measurement(Record, CanValidate):
         null=True,
     )
 
-    class Meta:
-        managed = True
-        db_table = "measurement"
 
-
-class Metadata(Record, CanValidate):
+class Metadata(Record, CanCurate, TracksRun, TracksUpdates):
     """Metadata information about a dataset that has been transformed to the OMOP Common Data Model."""
 
-    metadata_id: int = models.IntegerField(primary_key=True)
-    metadata_concept: Concept = models.ForeignKey(Concept, models.DO_NOTHING)
-    metadata_type_concept: Concept = models.ForeignKey(
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
+    metadata_id: int = IntegerField(primary_key=True)
+    metadata_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
+    metadata_type_concept: Concept = ForeignKey(
         Concept, models.DO_NOTHING, related_name="metadata_metadata_type_concept_set"
     )
-    name: str = models.CharField(max_length=250)
-    value_as_string: str = models.CharField(max_length=250, blank=True, null=True)
-    value_as_concept: Concept = models.ForeignKey(
+    name: str = CharField(max_length=250)
+    value_as_string: str = CharField(max_length=250, blank=True, null=True)
+    value_as_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="metadata_value_as_concept_set",
         blank=True,
         null=True,
     )
-    value_as_number: float = models.DecimalField(
+    value_as_number: float = DecimalField(
         max_digits=1000, decimal_places=1000, blank=True, null=True
     )
-    metadata_date: datetime = models.DateField(blank=True, null=True)
-    metadata_datetime: datetime = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        managed = True
-        db_table = "metadata"
+    metadata_date: datetime = DateField(blank=True, null=True)
+    metadata_datetime: datetime = DateTimeField(blank=True, null=True)
 
 
-class Note(Record, CanValidate):
+class Note(Record, CanCurate, TracksRun, TracksUpdates):
     """Unstructured information that was recorded by a provider about a patient in free text notes on a given date."""
 
-    note_id: int = models.IntegerField(primary_key=True)
-    person: Person = models.ForeignKey("Person", models.DO_NOTHING)
-    note_date: datetime = models.DateField()
-    note_datetime: datetime = models.DateTimeField(blank=True, null=True)
-    note_type_concept: Concept = models.ForeignKey(Concept, models.DO_NOTHING)
-    note_class_concept: Concept = models.ForeignKey(
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
+    note_id: int = IntegerField(primary_key=True)
+    person: Person = ForeignKey("Person", models.DO_NOTHING)
+    note_date: datetime = DateField()
+    note_datetime: datetime = DateTimeField(blank=True, null=True)
+    note_type_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
+    note_class_concept: Concept = ForeignKey(
         Concept, models.DO_NOTHING, related_name="note_note_class_concept_set"
     )
-    note_title: str = models.CharField(max_length=250, blank=True, null=True)
-    note_text: str = models.TextField()
-    encoding_concept: Concept = models.ForeignKey(
+    note_title: str = CharField(max_length=250, blank=True, null=True)
+    note_text: str = TextField()
+    encoding_concept: Concept = ForeignKey(
         Concept, models.DO_NOTHING, related_name="note_encoding_concept_set"
     )
-    language_concept: Concept = models.ForeignKey(
+    language_concept: Concept = ForeignKey(
         Concept, models.DO_NOTHING, related_name="note_language_concept_set"
     )
-    provider: Provider = models.ForeignKey(
+    provider: Provider = ForeignKey(
         "Provider", models.DO_NOTHING, blank=True, null=True
     )
-    visit_occurrence: VisitOccurrence = models.ForeignKey(
+    visit_occurrence: VisitOccurrence = ForeignKey(
         "VisitOccurrence", models.DO_NOTHING, blank=True, null=True
     )
-    visit_detail: VisitDetail = models.ForeignKey(
+    visit_detail: VisitDetail = ForeignKey(
         "VisitDetail", models.DO_NOTHING, blank=True, null=True
     )
-    note_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    note_event_id: int = models.IntegerField(blank=True, null=True)
-    note_event_field_concept: Concept = models.ForeignKey(
+    note_source_value: str = CharField(max_length=50, blank=True, null=True)
+    note_event_id: int = IntegerField(blank=True, null=True)
+    note_event_field_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="note_note_event_field_concept_set",
@@ -888,113 +860,109 @@ class Note(Record, CanValidate):
         null=True,
     )
 
-    class Meta:
-        managed = True
-        db_table = "note"
 
-
-class NoteNlp(Record, CanValidate):
+class NoteNlp(Record, CanCurate, TracksRun, TracksUpdates):
     """Encodes all output of NLP on clinical notes. Each row represents a single extracted term from a note."""
 
-    note_nlp_id: int = models.IntegerField(primary_key=True)
-    note_id: int = models.IntegerField()
-    section_concept: Concept = models.ForeignKey(
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
+    note_nlp_id: int = IntegerField(primary_key=True)
+    note_id: int = IntegerField()
+    section_concept: Concept = ForeignKey(
         Concept, models.DO_NOTHING, blank=True, null=True
     )
-    snippet: str = models.CharField(max_length=250, blank=True, null=True)
-    offset: str = models.CharField(max_length=50, blank=True, null=True)
-    lexical_variant: str = models.CharField(max_length=250)
-    note_nlp_concept: Concept = models.ForeignKey(
+    snippet: str = CharField(max_length=250, blank=True, null=True)
+    offset: str = CharField(max_length=50, blank=True, null=True)
+    lexical_variant: str = CharField(max_length=250)
+    note_nlp_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="notenlp_note_nlp_concept_set",
         blank=True,
         null=True,
     )
-    note_nlp_source_concept: Concept = models.ForeignKey(
+    note_nlp_source_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="notenlp_note_nlp_source_concept_set",
         blank=True,
         null=True,
     )
-    nlp_system: str = models.CharField(max_length=250, blank=True, null=True)
-    nlp_date: datetime = models.DateField()
-    nlp_datetime: datetime = models.DateTimeField(blank=True, null=True)
-    term_exists: str = models.CharField(max_length=1, blank=True, null=True)
-    term_temporal: str = models.CharField(max_length=50, blank=True, null=True)
-    term_modifiers: str = models.CharField(max_length=2000, blank=True, null=True)
-
-    class Meta:
-        managed = True
-        db_table = "note_nlp"
+    nlp_system: str = CharField(max_length=250, blank=True, null=True)
+    nlp_date: datetime = DateField()
+    nlp_datetime: datetime = DateTimeField(blank=True, null=True)
+    term_exists: str = CharField(max_length=1, blank=True, null=True)
+    term_temporal: str = CharField(max_length=50, blank=True, null=True)
+    term_modifiers: str = CharField(max_length=2000, blank=True, null=True)
 
 
-class Observation(Record, CanValidate):
+class Observation(Record, CanCurate, TracksRun, TracksUpdates):
     """Clinical facts about a Person obtained in the context of examination, questioning or a procedure.
 
     Any data that cannot be represented by any other domains, such as social and lifestyle facts, medical history, family history, etc. are recorded here.
     """
 
-    observation_id: int = models.IntegerField(primary_key=True)
-    person: Person = models.ForeignKey("Person", models.DO_NOTHING)
-    observation_concept: Concept = models.ForeignKey(Concept, models.DO_NOTHING)
-    observation_date: datetime = models.DateField()
-    observation_datetime: datetime = models.DateTimeField(blank=True, null=True)
-    observation_type_concept: Concept = models.ForeignKey(
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
+    observation_id: int = IntegerField(primary_key=True)
+    person: Person = ForeignKey("Person", models.DO_NOTHING)
+    observation_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
+    observation_date: datetime = DateField()
+    observation_datetime: datetime = DateTimeField(blank=True, null=True)
+    observation_type_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="observation_observation_type_concept_set",
     )
-    value_as_number: float = models.DecimalField(
+    value_as_number: float = DecimalField(
         max_digits=1000, decimal_places=1000, blank=True, null=True
     )
-    value_as_string: str = models.CharField(max_length=60, blank=True, null=True)
-    value_as_concept: Concept = models.ForeignKey(
+    value_as_string: str = CharField(max_length=60, blank=True, null=True)
+    value_as_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="observation_value_as_concept_set",
         blank=True,
         null=True,
     )
-    qualifier_concept: Concept = models.ForeignKey(
+    qualifier_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="observation_qualifier_concept_set",
         blank=True,
         null=True,
     )
-    unit_concept: Concept = models.ForeignKey(
+    unit_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="observation_unit_concept_set",
         blank=True,
         null=True,
     )
-    provider: Provider = models.ForeignKey(
+    provider: Provider = ForeignKey(
         "Provider", models.DO_NOTHING, blank=True, null=True
     )
-    visit_occurrence: VisitOccurrence = models.ForeignKey(
+    visit_occurrence: VisitOccurrence = ForeignKey(
         "VisitOccurrence", models.DO_NOTHING, blank=True, null=True
     )
-    visit_detail: VisitDetail = models.ForeignKey(
+    visit_detail: VisitDetail = ForeignKey(
         "VisitDetail", models.DO_NOTHING, blank=True, null=True
     )
-    observation_source_value: str = models.CharField(
-        max_length=50, blank=True, null=True
-    )
-    observation_source_concept: Concept = models.ForeignKey(
+    observation_source_value: str = CharField(max_length=50, blank=True, null=True)
+    observation_source_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="observation_observation_source_concept_set",
         blank=True,
         null=True,
     )
-    unit_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    qualifier_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    value_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    observation_event_id: int = models.IntegerField(blank=True, null=True)
-    obs_event_field_concept: Concept = models.ForeignKey(
+    unit_source_value: str = CharField(max_length=50, blank=True, null=True)
+    qualifier_source_value: str = CharField(max_length=50, blank=True, null=True)
+    value_source_value: str = CharField(max_length=50, blank=True, null=True)
+    observation_event_id: int = IntegerField(blank=True, null=True)
+    obs_event_field_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="observation_obs_event_field_concept_set",
@@ -1002,30 +970,25 @@ class Observation(Record, CanValidate):
         null=True,
     )
 
-    class Meta:
-        managed = True
-        db_table = "observation"
 
-
-class ObservationPeriod(Record, CanValidate):
+class ObservationPeriod(Record, CanCurate, TracksRun, TracksUpdates):
     """Records which define spans of time during which two conditions are expected to hold.
 
     (i) Clinical Events that happened to the Person are recorded in the Event tables, and
     (ii) absense of records indicate such Events did not occur during this span of time.
     """
 
-    observation_period_id: int = models.IntegerField(primary_key=True)
-    person: Person = models.ForeignKey("Person", models.DO_NOTHING)
-    observation_period_start_date: datetime = models.DateField()
-    observation_period_end_date: datetime = models.DateField()
-    period_type_concept: Concept = models.ForeignKey(Concept, models.DO_NOTHING)
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
 
-    class Meta:
-        managed = True
-        db_table = "observation_period"
+    observation_period_id: int = IntegerField(primary_key=True)
+    person: Person = ForeignKey("Person", models.DO_NOTHING)
+    observation_period_start_date: datetime = DateField()
+    observation_period_end_date: datetime = DateField()
+    period_type_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
 
 
-class PayerPlanPeriod(Record, CanValidate):
+class PayerPlanPeriod(Record, CanCurate, TracksRun, TracksUpdates):
     """Details of the period of time that a Person is continuously enrolled under a specific health Plan benefit structure from a given Payer.
 
     Each Person receiving healthcare is typically covered by a health benefit plan, which pays for (fully or partially), or directly provides, the care.
@@ -1034,63 +997,64 @@ class PayerPlanPeriod(Record, CanValidate):
     The unique combinations of Payer organizations, health benefit Plans and time periods in which they are valid for a Person are recorded in this table.
     """
 
-    payer_plan_period_id: int = models.IntegerField(primary_key=True)
-    person: Person = models.ForeignKey("Person", models.DO_NOTHING)
-    payer_plan_period_start_date: datetime = models.DateField()
-    payer_plan_period_end_date: datetime = models.DateField()
-    payer_concept: Concept = models.ForeignKey(
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
+    payer_plan_period_id: int = IntegerField(primary_key=True)
+    person: Person = ForeignKey("Person", models.DO_NOTHING)
+    payer_plan_period_start_date: datetime = DateField()
+    payer_plan_period_end_date: datetime = DateField()
+    payer_concept: Concept = ForeignKey(
         Concept, models.DO_NOTHING, blank=True, null=True
     )
-    payer_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    payer_source_concept: Concept = models.ForeignKey(
+    payer_source_value: str = CharField(max_length=50, blank=True, null=True)
+    payer_source_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="payerplanperiod_payer_source_concept_set",
         blank=True,
         null=True,
     )
-    plan_concept: Concept = models.ForeignKey(
+    plan_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="payerplanperiod_plan_concept_set",
         blank=True,
         null=True,
     )
-    plan_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    plan_source_concept: Concept = models.ForeignKey(
+    plan_source_value: str = CharField(max_length=50, blank=True, null=True)
+    plan_source_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="payerplanperiod_plan_source_concept_set",
         blank=True,
         null=True,
     )
-    sponsor_concept: Concept = models.ForeignKey(
+    sponsor_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="payerplanperiod_sponsor_concept_set",
         blank=True,
         null=True,
     )
-    sponsor_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    sponsor_source_concept: Concept = models.ForeignKey(
+    sponsor_source_value: str = CharField(max_length=50, blank=True, null=True)
+    sponsor_source_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="payerplanperiod_sponsor_source_concept_set",
         blank=True,
         null=True,
     )
-    family_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    stop_reason_concept: Concept = models.ForeignKey(
+    family_source_value: str = CharField(max_length=50, blank=True, null=True)
+    stop_reason_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="payerplanperiod_stop_reason_concept_set",
         blank=True,
         null=True,
     )
-    stop_reason_source_value: str = models.CharField(
-        max_length=50, blank=True, null=True
-    )
-    stop_reason_source_concept: Concept = models.ForeignKey(
+    stop_reason_source_value: str = CharField(max_length=50, blank=True, null=True)
+    stop_reason_source_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="payerplanperiod_stop_reason_source_concept_set",
@@ -1098,57 +1062,52 @@ class PayerPlanPeriod(Record, CanValidate):
         null=True,
     )
 
-    class Meta:
-        managed = True
-        db_table = "payer_plan_period"
 
-
-class Person(Record, CanValidate):
+class Person(Record, CanCurate, TracksRun, TracksUpdates):
     """Identity management for all Persons in the database.
 
     Records that uniquely identify each person or patient, and some demographic information.
     """
 
-    person_id: int = models.IntegerField(primary_key=True)
-    gender_concept: Concept = models.ForeignKey(Concept, models.DO_NOTHING)
-    year_of_birth: int = models.IntegerField()
-    month_of_birth: int = models.IntegerField(blank=True, null=True)
-    day_of_birth: int = models.IntegerField(blank=True, null=True)
-    birth_datetime: datetime = models.DateTimeField(blank=True, null=True)
-    race_concept: Concept = models.ForeignKey(
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
+    person_id: int = IntegerField(primary_key=True)
+    gender_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
+    year_of_birth: int = IntegerField()
+    month_of_birth: int = IntegerField(blank=True, null=True)
+    day_of_birth: int = IntegerField(blank=True, null=True)
+    birth_datetime: datetime = DateTimeField(blank=True, null=True)
+    race_concept: Concept = ForeignKey(
         Concept, models.DO_NOTHING, related_name="person_race_concept_set"
     )
-    ethnicity_concept: Concept = models.ForeignKey(
+    ethnicity_concept: Concept = ForeignKey(
         Concept, models.DO_NOTHING, related_name="person_ethnicity_concept_set"
     )
-    location: Location = models.ForeignKey(
-        Location, models.DO_NOTHING, blank=True, null=True
-    )
-    provider: Provider = models.ForeignKey(
+    location: Location = ForeignKey(Location, models.DO_NOTHING, blank=True, null=True)
+    provider: Provider = ForeignKey(
         "Provider", models.DO_NOTHING, blank=True, null=True
     )
-    care_site: CareSite = models.ForeignKey(
-        CareSite, models.DO_NOTHING, blank=True, null=True
-    )
-    person_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    gender_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    gender_source_concept: Concept = models.ForeignKey(
+    care_site: CareSite = ForeignKey(CareSite, models.DO_NOTHING, blank=True, null=True)
+    person_source_value: str = CharField(max_length=50, blank=True, null=True)
+    gender_source_value: str = CharField(max_length=50, blank=True, null=True)
+    gender_source_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="person_gender_source_concept_set",
         blank=True,
         null=True,
     )
-    race_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    race_source_concept: Concept = models.ForeignKey(
+    race_source_value: str = CharField(max_length=50, blank=True, null=True)
+    race_source_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="person_race_source_concept_set",
         blank=True,
         null=True,
     )
-    ethnicity_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    ethnicity_source_concept: Concept = models.ForeignKey(
+    ethnicity_source_value: str = CharField(max_length=50, blank=True, null=True)
+    ethnicity_source_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="person_ethnicity_source_concept_set",
@@ -1156,93 +1115,89 @@ class Person(Record, CanValidate):
         null=True,
     )
 
-    class Meta:
-        managed = True
-        db_table = "person"
 
-
-class ProcedureOccurrence(Record, CanValidate):
+class ProcedureOccurrence(Record, CanCurate, TracksRun, TracksUpdates):
     """Records of activities or processes ordered by, or carried out by, a healthcare provider on the patient with a diagnostic or therapeutic purpose."""
 
-    procedure_occurrence_id: int = models.IntegerField(primary_key=True)
-    person: Person = models.ForeignKey(Person, models.DO_NOTHING)
-    procedure_concept: Concept = models.ForeignKey(Concept, models.DO_NOTHING)
-    procedure_date: datetime = models.DateField()
-    procedure_datetime: datetime = models.DateTimeField(blank=True, null=True)
-    procedure_end_date: datetime = models.DateField(blank=True, null=True)
-    procedure_end_datetime: datetime = models.DateTimeField(blank=True, null=True)
-    procedure_type_concept: Concept = models.ForeignKey(
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
+    procedure_occurrence_id: int = IntegerField(primary_key=True)
+    person: Person = ForeignKey(Person, models.DO_NOTHING)
+    procedure_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
+    procedure_date: datetime = DateField()
+    procedure_datetime: datetime = DateTimeField(blank=True, null=True)
+    procedure_end_date: datetime = DateField(blank=True, null=True)
+    procedure_end_datetime: datetime = DateTimeField(blank=True, null=True)
+    procedure_type_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="procedureoccurrence_procedure_type_concept_set",
     )
-    modifier_concept: Concept = models.ForeignKey(
+    modifier_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="procedureoccurrence_modifier_concept_set",
         blank=True,
         null=True,
     )
-    quantity: int = models.IntegerField(blank=True, null=True)
-    provider: Provider = models.ForeignKey(
+    quantity: int = IntegerField(blank=True, null=True)
+    provider: Provider = ForeignKey(
         "Provider", models.DO_NOTHING, blank=True, null=True
     )
-    visit_occurrence: VisitOccurrence = models.ForeignKey(
+    visit_occurrence: VisitOccurrence = ForeignKey(
         "VisitOccurrence", models.DO_NOTHING, blank=True, null=True
     )
-    visit_detail: VisitDetail = models.ForeignKey(
+    visit_detail: VisitDetail = ForeignKey(
         "VisitDetail", models.DO_NOTHING, blank=True, null=True
     )
-    procedure_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    procedure_source_concept: Concept = models.ForeignKey(
+    procedure_source_value: str = CharField(max_length=50, blank=True, null=True)
+    procedure_source_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="procedureoccurrence_procedure_source_concept_set",
         blank=True,
         null=True,
     )
-    modifier_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-
-    class Meta:
-        managed = True
-        db_table = "procedure_occurrence"
+    modifier_source_value: str = CharField(max_length=50, blank=True, null=True)
 
 
-class Provider(Record, CanValidate):
+class Provider(Record, CanCurate, TracksRun, TracksUpdates):
     """Uniquely identified healthcare providers.
 
     Individuals providing hands-on healthcare to patients, such as physicians, nurses, midwives, physical therapists etc.
     """
 
-    provider_id: int = models.IntegerField(primary_key=True)
-    provider_name: str = models.CharField(max_length=255, blank=True, null=True)
-    npi: str = models.CharField(max_length=20, blank=True, null=True)
-    dea: str = models.CharField(max_length=20, blank=True, null=True)
-    specialty_concept: Concept = models.ForeignKey(
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
+    provider_id: int = IntegerField(primary_key=True)
+    provider_name: str = CharField(max_length=255, blank=True, null=True)
+    npi: str = CharField(max_length=20, blank=True, null=True)
+    dea: str = CharField(max_length=20, blank=True, null=True)
+    specialty_concept: Concept = ForeignKey(
         Concept, models.DO_NOTHING, blank=True, null=True
     )
-    care_site: CareSite = models.ForeignKey(
-        CareSite, models.DO_NOTHING, blank=True, null=True
-    )
-    year_of_birth: int = models.IntegerField(blank=True, null=True)
-    gender_concept: Concept = models.ForeignKey(
+    care_site: CareSite = ForeignKey(CareSite, models.DO_NOTHING, blank=True, null=True)
+    year_of_birth: int = IntegerField(blank=True, null=True)
+    gender_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="provider_gender_concept_set",
         blank=True,
         null=True,
     )
-    provider_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    specialty_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    specialty_source_concept: Concept = models.ForeignKey(
+    provider_source_value: str = CharField(max_length=50, blank=True, null=True)
+    specialty_source_value: str = CharField(max_length=50, blank=True, null=True)
+    specialty_source_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="provider_specialty_source_concept_set",
         blank=True,
         null=True,
     )
-    gender_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    gender_source_concept: Concept = models.ForeignKey(
+    gender_source_value: str = CharField(max_length=50, blank=True, null=True)
+    gender_source_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="provider_gender_source_concept_set",
@@ -1250,27 +1205,22 @@ class Provider(Record, CanValidate):
         null=True,
     )
 
-    class Meta:
-        managed = True
-        db_table = "provider"
 
-
-class Relationship(Record, CanValidate):
+class Relationship(Record, CanCurate, TracksRun, TracksUpdates):
     """All types of relationships that can be used to associate any two concepts in the CONCEPT_RELATIONSHP table."""
 
-    relationship_id: str = models.CharField(primary_key=True, max_length=20)
-    relationship_name: str = models.CharField(max_length=255)
-    is_hierarchical: str = models.CharField(max_length=1)
-    defines_ancestry: str = models.CharField(max_length=1)
-    reverse_relationship_id: str = models.CharField(max_length=20)
-    relationship_concept: Concept = models.ForeignKey(Concept, models.DO_NOTHING)
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
 
-    class Meta:
-        managed = True
-        db_table = "relationship"
+    relationship_id: str = CharField(primary_key=True, max_length=20)
+    relationship_name: str = CharField(max_length=255)
+    is_hierarchical: str = CharField(max_length=1)
+    defines_ancestry: str = CharField(max_length=1)
+    reverse_relationship_id: str = CharField(max_length=20)
+    relationship_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
 
 
-class SourceToConceptMap(Record, CanValidate):
+class SourceToConceptMap(Record, CanCurate, TracksRun, TracksUpdates):
     """The source to concept map table is a legacy data structure within the OMOP Common Data Model.
 
     It is recommended for use in ETL processes to maintain local source codes which are not available as Concepts in the Standardized Vocabularies,
@@ -1278,76 +1228,68 @@ class SourceToConceptMap(Record, CanValidate):
     The SOURCE_TO_CONCEPT_MAP table is no longer populated with content within the Standardized Vocabularies published to the OMOP community.
     """
 
-    source_code: str = models.CharField(max_length=50)
-    source_concept: str = models.ForeignKey(Concept, models.DO_NOTHING)
-    source_vocabulary_id: str = models.CharField(max_length=20)
-    source_code_description: str = models.CharField(
-        max_length=255, blank=True, null=True
-    )
-    target_concept: Concept = models.ForeignKey(
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
+    source_code: str = CharField(max_length=50)
+    source_concept: str = ForeignKey(Concept, models.DO_NOTHING)
+    source_vocabulary_id: str = CharField(max_length=20)
+    source_code_description: str = CharField(max_length=255, blank=True, null=True)
+    target_concept: Concept = ForeignKey(
         Concept, models.DO_NOTHING, related_name="sourcetoconceptmap_target_concept_set"
     )
-    target_vocabulary: Vocabulary = models.ForeignKey("Vocabulary", models.DO_NOTHING)
-    valid_start_date: datetime = models.DateField()
-    valid_end_date: datetime = models.DateField()
-    invalid_reason: str = models.CharField(max_length=1, blank=True, null=True)
-
-    class Meta:
-        managed = True
-        db_table = "source_to_concept_map"
+    target_vocabulary: Vocabulary = ForeignKey("Vocabulary", models.DO_NOTHING)
+    valid_start_date: datetime = DateField()
+    valid_end_date: datetime = DateField()
+    invalid_reason: str = CharField(max_length=1, blank=True, null=True)
 
 
-class Specimen(Record, CanValidate):
+class Specimen(Record, CanCurate, TracksRun, TracksUpdates):
     """The specimen domain contains the records identifying biological samples from a person."""
 
-    specimen_id: int = models.IntegerField(primary_key=True)
-    person: Person = models.ForeignKey(Person, models.DO_NOTHING)
-    specimen_concept: Concept = models.ForeignKey(Concept, models.DO_NOTHING)
-    specimen_type_concept: Concept = models.ForeignKey(
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
+    specimen_id: int = IntegerField(primary_key=True)
+    person: Person = ForeignKey(Person, models.DO_NOTHING)
+    specimen_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
+    specimen_type_concept: Concept = ForeignKey(
         Concept, models.DO_NOTHING, related_name="specimen_specimen_type_concept_set"
     )
-    specimen_date: datetime = models.DateField()
-    specimen_datetime: datetime = models.DateTimeField(blank=True, null=True)
-    quantity: float = models.DecimalField(
+    specimen_date: datetime = DateField()
+    specimen_datetime: datetime = DateTimeField(blank=True, null=True)
+    quantity: float = DecimalField(
         max_digits=1000, decimal_places=1000, blank=True, null=True
     )
-    unit_concept: Concept = models.ForeignKey(
+    unit_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="specimen_unit_concept_set",
         blank=True,
         null=True,
     )
-    anatomic_site_concept: Concept = models.ForeignKey(
+    anatomic_site_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="specimen_anatomic_site_concept_set",
         blank=True,
         null=True,
     )
-    disease_status_concept: Concept = models.ForeignKey(
+    disease_status_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="specimen_disease_status_concept_set",
         blank=True,
         null=True,
     )
-    specimen_source_id: str = models.CharField(max_length=50, blank=True, null=True)
-    specimen_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    unit_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    anatomic_site_source_value: str = models.CharField(
-        max_length=50, blank=True, null=True
-    )
-    disease_status_source_value: str = models.CharField(
-        max_length=50, blank=True, null=True
-    )
-
-    class Meta:
-        managed = True
-        db_table = "specimen"
+    specimen_source_id: str = CharField(max_length=50, blank=True, null=True)
+    specimen_source_value: str = CharField(max_length=50, blank=True, null=True)
+    unit_source_value: str = CharField(max_length=50, blank=True, null=True)
+    anatomic_site_source_value: str = CharField(max_length=50, blank=True, null=True)
+    disease_status_source_value: str = CharField(max_length=50, blank=True, null=True)
 
 
-class VisitDetail(Record, CanValidate):
+class VisitDetail(Record, CanCurate, TracksRun, TracksUpdates):
     """Optional table used to represents details of each record in the parent VISIT_OCCURRENCE table.
 
     A good example of this would be the movement between units in a hospital during an inpatient stay or claim lines associated with a one insurance claim.
@@ -1355,74 +1297,61 @@ class VisitDetail(Record, CanValidate):
     The VISIT_DETAIL table is structurally very similar to VISIT_OCCURRENCE table and belongs to the visit domain.
     """
 
-    visit_detail_id: int = models.IntegerField(primary_key=True)
-    person: Person = models.ForeignKey(Person, models.DO_NOTHING)
-    visit_detail_concept: Concept = models.ForeignKey(Concept, models.DO_NOTHING)
-    visit_detail_start_date: datetime = models.DateField()
-    visit_detail_start_datetime: datetime = models.DateTimeField(blank=True, null=True)
-    visit_detail_end_date: datetime = models.DateField()
-    visit_detail_end_datetime: datetime = models.DateTimeField(blank=True, null=True)
-    visit_detail_type_concept: Concept = models.ForeignKey(
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
+    visit_detail_id: int = IntegerField(primary_key=True)
+    person: Person = ForeignKey(Person, models.DO_NOTHING)
+    visit_detail_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
+    visit_detail_start_date: datetime = DateField()
+    visit_detail_start_datetime: datetime = DateTimeField(blank=True, null=True)
+    visit_detail_end_date: datetime = DateField()
+    visit_detail_end_datetime: datetime = DateTimeField(blank=True, null=True)
+    visit_detail_type_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="visitdetail_visit_detail_type_concept_set",
     )
-    provider: Provider = models.ForeignKey(
-        Provider, models.DO_NOTHING, blank=True, null=True
-    )
-    care_site: CareSite = models.ForeignKey(
-        CareSite, models.DO_NOTHING, blank=True, null=True
-    )
-    visit_detail_source_value: str = models.CharField(
-        max_length=50, blank=True, null=True
-    )
-    visit_detail_source_concept: Concept = models.ForeignKey(
+    provider: Provider = ForeignKey(Provider, models.DO_NOTHING, blank=True, null=True)
+    care_site: CareSite = ForeignKey(CareSite, models.DO_NOTHING, blank=True, null=True)
+    visit_detail_source_value: str = CharField(max_length=50, blank=True, null=True)
+    visit_detail_source_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="visitdetail_visit_detail_source_concept_set",
         blank=True,
         null=True,
     )
-    admitted_from_concept: Concept = models.ForeignKey(
+    admitted_from_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="visitdetail_admitted_from_concept_set",
         blank=True,
         null=True,
     )
-    admitted_from_source_value: str = models.CharField(
-        max_length=50, blank=True, null=True
-    )
-    discharged_to_source_value: str = models.CharField(
-        max_length=50, blank=True, null=True
-    )
-    discharged_to_concept: Concept = models.ForeignKey(
+    admitted_from_source_value: str = CharField(max_length=50, blank=True, null=True)
+    discharged_to_source_value: str = CharField(max_length=50, blank=True, null=True)
+    discharged_to_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="visitdetail_discharged_to_concept_set",
         blank=True,
         null=True,
     )
-    preceding_visit_detail: VisitDetail = models.ForeignKey(
+    preceding_visit_detail: VisitDetail = ForeignKey(
         "self", models.DO_NOTHING, blank=True, null=True
     )
-    parent_visit_detail: VisitDetail = models.ForeignKey(
+    parent_visit_detail: VisitDetail = ForeignKey(
         "self",
         models.DO_NOTHING,
         related_name="visitdetail_parent_visit_detail_set",
         blank=True,
         null=True,
     )
-    visit_occurrence: VisitOccurrence = models.ForeignKey(
-        "VisitOccurrence", models.DO_NOTHING
-    )
-
-    class Meta:
-        managed = True
-        db_table = "visit_detail"
+    visit_occurrence: VisitOccurrence = ForeignKey("VisitOccurrence", models.DO_NOTHING)
 
 
-class VisitOccurrence(Record, CanValidate):
+class VisitOccurrence(Record, CanCurate, TracksRun, TracksUpdates):
     """Events where Persons engage with the healthcare system for a duration of time.
 
     They are often also called Encounters. Visits are defined by a configuration of circumstances under which they occur, such as
@@ -1431,73 +1360,63 @@ class VisitOccurrence(Record, CanValidate):
     (iii) whether the Visit is transient or for a longer period involving a stay in bed.
     """
 
-    visit_occurrence_id: int = models.IntegerField(primary_key=True)
-    person: Person = models.ForeignKey(Person, models.DO_NOTHING)
-    visit_concept: Concept = models.ForeignKey(Concept, models.DO_NOTHING)
-    visit_start_date: datetime = models.DateField()
-    visit_start_datetime: datetime = models.DateTimeField(blank=True, null=True)
-    visit_end_date: datetime = models.DateField()
-    visit_end_datetime: datetime = models.DateTimeField(blank=True, null=True)
-    visit_type_concept: Concept = models.ForeignKey(
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
+
+    visit_occurrence_id: int = IntegerField(primary_key=True)
+    person: Person = ForeignKey(Person, models.DO_NOTHING)
+    visit_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
+    visit_start_date: datetime = DateField()
+    visit_start_datetime: datetime = DateTimeField(blank=True, null=True)
+    visit_end_date: datetime = DateField()
+    visit_end_datetime: datetime = DateTimeField(blank=True, null=True)
+    visit_type_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="visitoccurrence_visit_type_concept_set",
     )
-    provider: Provider = models.ForeignKey(
-        Provider, models.DO_NOTHING, blank=True, null=True
-    )
-    care_site: CareSite = models.ForeignKey(
-        CareSite, models.DO_NOTHING, blank=True, null=True
-    )
-    visit_source_value: str = models.CharField(max_length=50, blank=True, null=True)
-    visit_source_concept: Concept = models.ForeignKey(
+    provider: Provider = ForeignKey(Provider, models.DO_NOTHING, blank=True, null=True)
+    care_site: CareSite = ForeignKey(CareSite, models.DO_NOTHING, blank=True, null=True)
+    visit_source_value: str = CharField(max_length=50, blank=True, null=True)
+    visit_source_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="visitoccurrence_visit_source_concept_set",
         blank=True,
         null=True,
     )
-    admitted_from_concept: Concept = models.ForeignKey(
+    admitted_from_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="visitoccurrence_admitted_from_concept_set",
         blank=True,
         null=True,
     )
-    admitted_from_source_value: str = models.CharField(
-        max_length=50, blank=True, null=True
-    )
-    discharged_to_concept: Concept = models.ForeignKey(
+    admitted_from_source_value: str = CharField(max_length=50, blank=True, null=True)
+    discharged_to_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="visitoccurrence_discharged_to_concept_set",
         blank=True,
         null=True,
     )
-    discharged_to_source_value: str = models.CharField(
-        max_length=50, blank=True, null=True
-    )
-    preceding_visit_occurrence: VisitOccurrence = models.ForeignKey(
+    discharged_to_source_value: str = CharField(max_length=50, blank=True, null=True)
+    preceding_visit_occurrence: VisitOccurrence = ForeignKey(
         "self", models.DO_NOTHING, blank=True, null=True
     )
 
-    class Meta:
-        managed = True
-        db_table = "visit_occurrence"
 
-
-class Vocabulary(Record, CanValidate):
+class Vocabulary(Record, CanCurate, TracksRun, TracksUpdates):
     """Vocabularies collected from various sources or created de novo by the OMOP community.
 
     Populated with a single record for each Vocabulary source and includes a descriptive name and other associated attributes for the Vocabulary.
     """
 
-    vocabulary_id: str = models.CharField(primary_key=True, max_length=20)
-    vocabulary_name: str = models.CharField(max_length=255)
-    vocabulary_reference: str = models.CharField(max_length=255, blank=True, null=True)
-    vocabulary_version: str = models.CharField(max_length=255, blank=True, null=True)
-    vocabulary_concept: Concept = models.ForeignKey(Concept, models.DO_NOTHING)
+    class Meta(Record.Meta, TracksRun.Meta, TracksUpdates.Meta):
+        abstract = False
 
-    class Meta:
-        managed = True
-        db_table = "vocabulary"
+    vocabulary_id: str = CharField(primary_key=True, max_length=20)
+    vocabulary_name: str = CharField(max_length=255)
+    vocabulary_reference: str = CharField(max_length=255, blank=True, null=True)
+    vocabulary_version: str = CharField(max_length=255, blank=True, null=True)
+    vocabulary_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
