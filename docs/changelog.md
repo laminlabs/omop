@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+♻️ Clean up | [10](https://github.com/laminlabs/omop/pull/10) | [sunnyosun](https://github.com/sunnyosun) | 2024-11-21 |
 🎨 Set blank=True | [9](https://github.com/laminlabs/omop/pull/9) | [sunnyosun](https://github.com/sunnyosun) | 2024-11-17 |
 ✨Add typehints and validation | [8](https://github.com/laminlabs/omop/pull/8) | [Zethson](https://github.com/Zethson) | 2024-10-09 |
 🎨 Fix DecimalField | [4](https://github.com/laminlabs/omop/pull/4) | [sunnyosun](https://github.com/sunnyosun) | 2024-09-16 |
