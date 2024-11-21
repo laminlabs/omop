@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime  # noqa
+from decimal import Decimal  # noqa
 
 from django.db import models
 from lnschema_core.fields import (
@@ -22,17 +23,13 @@ class CareSite(Record, CanCurate, TracksRun, TracksUpdates):
         abstract = False
 
     care_site_id: int = IntegerField(primary_key=True)
-    care_site_name: str | None = CharField(max_length=255, blank=True, null=True)
+    care_site_name: str | None = CharField(null=True)
     place_of_service_concept: Concept | None = ForeignKey(
-        "Concept", models.DO_NOTHING, blank=True, null=True
+        "Concept", models.DO_NOTHING, null=True
     )
-    location: Location | None = ForeignKey(
-        "Location", models.DO_NOTHING, blank=True, null=True
-    )
-    care_site_source_value: str | None = CharField(max_length=50, blank=True, null=True)
-    place_of_service_source_value: str | None = CharField(
-        max_length=50, blank=True, null=True
-    )
+    location: Location | None = ForeignKey("Location", models.DO_NOTHING, null=True)
+    care_site_source_value: str | None = CharField(max_length=50, null=True)
+    place_of_service_source_value: str | None = CharField(max_length=50, null=True)
 
 
 class CdmSource(Record, CanCurate, TracksRun, TracksUpdates):
@@ -44,14 +41,12 @@ class CdmSource(Record, CanCurate, TracksRun, TracksUpdates):
     cdm_source_name: str = CharField(max_length=255)
     cdm_source_abbreviation: str = CharField(max_length=25)
     cdm_holder: str = CharField(max_length=255)
-    source_description: str | None = TextField(blank=True, null=True)
-    source_documentation_reference: str | None = CharField(
-        max_length=255, blank=True, null=True
-    )
-    cdm_etl_reference: str | None = CharField(max_length=255, blank=True, null=True)
+    source_description: str | None = TextField(null=True)
+    source_documentation_reference: str | None = CharField(null=True)
+    cdm_etl_reference: str | None = CharField(null=True)
     source_release_date: datetime = DateField()
     cdm_release_date: datetime = DateField()
-    cdm_version: str | None = CharField(max_length=10, blank=True, null=True)
+    cdm_version: str | None = CharField(max_length=10, null=True)
     cdm_version_concept: Concept = ForeignKey("Concept", models.DO_NOTHING)
     vocabulary_version: str = CharField(max_length=20)
 
@@ -86,15 +81,15 @@ class CohortDefinition(Record, CanCurate, TracksRun, TracksUpdates):
 
     cohort_definition_id: int = IntegerField()
     cohort_definition_name: str = CharField(max_length=255)
-    cohort_definition_description: str = TextField(blank=True, null=True)
+    cohort_definition_description: str | None = TextField(null=True)
     definition_type_concept: Concept = ForeignKey("Concept", models.DO_NOTHING)
-    cohort_definition_syntax: str = TextField(blank=True, null=True)
+    cohort_definition_syntax: str | None = TextField(null=True)
     subject_concept: Concept = ForeignKey(
         "Concept",
         models.DO_NOTHING,
         related_name="cohortdefinition_subject_concept_set",
     )
-    cohort_initiation_date = DateField(blank=True, null=True)
+    cohort_initiation_date = DateField(null=True)
 
 
 class Concept(Record, CanCurate, TracksRun, TracksUpdates):
@@ -115,11 +110,11 @@ class Concept(Record, CanCurate, TracksRun, TracksUpdates):
     domain_id: str = CharField(max_length=255)
     vocabulary_id: str = CharField(max_length=255)
     concept_class: str = CharField(max_length=255)
-    standard_concept: str = CharField(max_length=1, blank=True, null=True)
+    standard_concept: str | None = CharField(max_length=1, null=True)
     concept_code: str = CharField(max_length=50)
     valid_start_date: datetime = DateField()
     valid_end_date: datetime = DateField()
-    invalid_reason: str = CharField(max_length=1, blank=True, null=True)
+    invalid_reason: str | None = CharField(max_length=1, null=True)
 
 
 class ConceptAncestor(Record, CanCurate, TracksRun, TracksUpdates):
@@ -182,7 +177,7 @@ class ConceptRelationship(Record, CanCurate, TracksRun, TracksUpdates):
     relationship: Relationship = ForeignKey("Relationship", models.DO_NOTHING)
     valid_start_date: datetime = DateField()
     valid_end_date: datetime = DateField()
-    invalid_reason: str = CharField(max_length=1, blank=True, null=True)
+    invalid_reason: str | None = CharField(max_length=1, null=True)
 
 
 class ConceptSynonym(Record, CanCurate, TracksRun, TracksUpdates):
@@ -217,7 +212,7 @@ class ConditionEra(Record, CanCurate, TracksRun, TracksUpdates):
     condition_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
     condition_era_start_date: datetime = DateField()
     condition_era_end_date: datetime = DateField()
-    condition_occurrence_count: int = IntegerField(blank=True, null=True)
+    condition_occurrence_count: int | None = IntegerField(null=True)
 
 
 class ConditionOccurrence(Record, CanCurate, TracksRun, TracksUpdates):
@@ -234,40 +229,34 @@ class ConditionOccurrence(Record, CanCurate, TracksRun, TracksUpdates):
     person: Person = ForeignKey("Person", models.DO_NOTHING)
     condition_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
     condition_start_date: datetime = DateField()
-    condition_start_datetime: datetime = DateTimeField(blank=True, null=True)
-    condition_end_date: datetime = DateField(blank=True, null=True)
-    condition_end_datetime: datetime = DateTimeField(blank=True, null=True)
+    condition_start_datetime: datetime | None = DateTimeField(null=True)
+    condition_end_date: datetime | None = DateField(null=True)
+    condition_end_datetime: datetime | None = DateTimeField(null=True)
     condition_type_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="conditionoccurrence_condition_type_concept_set",
     )
-    condition_status_concept: Concept = ForeignKey(
+    condition_status_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="conditionoccurrence_condition_status_concept_set",
-        blank=True,
         null=True,
     )
-    stop_reason: str = CharField(max_length=20, blank=True, null=True)
-    provider: Provider = ForeignKey(
-        "Provider", models.DO_NOTHING, blank=True, null=True
+    stop_reason: str | None = CharField(max_length=20, null=True)
+    provider: Provider | None = ForeignKey("Provider", models.DO_NOTHING, null=True)
+    visit_occurrence: VisitOccurrence | None = ForeignKey(
+        "VisitOccurrence", models.DO_NOTHING, null=True
     )
-    visit_occurrence: VisitOccurrence = ForeignKey(
-        "VisitOccurrence", models.DO_NOTHING, blank=True, null=True
-    )
-    visit_detail: VisitDetail = ForeignKey(
-        "VisitDetail", models.DO_NOTHING, blank=True, null=True
-    )
-    condition_source_value: str = CharField(max_length=50, blank=True, null=True)
-    condition_source_concept: Concept = ForeignKey(
+    visit_detail: VisitDetail = ForeignKey("VisitDetail", models.DO_NOTHING, null=True)
+    condition_source_value: str | None = CharField(max_length=50, null=True)
+    condition_source_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="conditionoccurrence_condition_source_concept_set",
-        blank=True,
         null=True,
     )
-    condition_status_source_value: str = CharField(max_length=50, blank=True, null=True)
+    condition_status_source_value: str | None = CharField(max_length=50, null=True)
 
 
 class Cost(Record, CanCurate, TracksRun, TracksUpdates):
@@ -283,66 +272,63 @@ class Cost(Record, CanCurate, TracksRun, TracksUpdates):
     cost_event_id: int = IntegerField()
     cost_domain: Domain = ForeignKey("Domain", models.DO_NOTHING)
     cost_type_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
-    currency_concept: Concept = ForeignKey(
+    currency_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="cost_currency_concept_set",
-        blank=True,
         null=True,
     )
-    total_charge: int = DecimalField(
-        max_digits=1000, decimal_places=1000, blank=True, null=True
+    total_charge: int | None = DecimalField(
+        max_digits=1000, decimal_places=1000, null=True
     )
-    total_cost: float = DecimalField(
-        max_digits=1000, decimal_places=1000, blank=True, null=True
+    total_cost: float | None = DecimalField(
+        max_digits=1000, decimal_places=1000, null=True
     )
-    total_paid: float = DecimalField(
-        max_digits=1000, decimal_places=1000, blank=True, null=True
+    total_paid: float | None = DecimalField(
+        max_digits=1000, decimal_places=1000, null=True
     )
-    paid_by_payer: float = DecimalField(
-        max_digits=1000, decimal_places=1000, blank=True, null=True
+    paid_by_payer: float | None = DecimalField(
+        max_digits=1000, decimal_places=1000, null=True
     )
-    paid_by_patient: float = DecimalField(
-        max_digits=1000, decimal_places=1000, blank=True, null=True
+    paid_by_patient: float | None = DecimalField(
+        max_digits=1000, decimal_places=1000, null=True
     )
-    paid_patient_copay: float = DecimalField(
-        max_digits=1000, decimal_places=1000, blank=True, null=True
+    paid_patient_copay: float | None = DecimalField(
+        max_digits=1000, decimal_places=1000, null=True
     )
-    paid_patient_coinsurance: float = DecimalField(
-        max_digits=1000, decimal_places=1000, blank=True, null=True
+    paid_patient_coinsurance: float | None = DecimalField(
+        max_digits=1000, decimal_places=1000, null=True
     )
-    paid_patient_deductible: float = DecimalField(
-        max_digits=1000, decimal_places=1000, blank=True, null=True
+    paid_patient_deductible: float | None = DecimalField(
+        max_digits=1000, decimal_places=1000, null=True
     )
-    paid_by_primary: float = DecimalField(
-        max_digits=1000, decimal_places=1000, blank=True, null=True
+    paid_by_primary: float | None = DecimalField(
+        max_digits=1000, decimal_places=1000, null=True
     )
-    paid_ingredient_cost: float = DecimalField(
-        max_digits=1000, decimal_places=1000, blank=True, null=True
+    paid_ingredient_cost: float | None = DecimalField(
+        max_digits=1000, decimal_places=1000, null=True
     )
-    paid_dispensing_fee: float = DecimalField(
-        max_digits=1000, decimal_places=1000, blank=True, null=True
+    paid_dispensing_fee: float | None = DecimalField(
+        max_digits=1000, decimal_places=1000, null=True
     )
-    payer_plan_period_id: float = IntegerField(blank=True, null=True)
-    amount_allowed = DecimalField(
-        max_digits=1000, decimal_places=1000, blank=True, null=True
+    payer_plan_period_id: float | None = IntegerField(null=True)
+    amount_allowed: Decimal = DecimalField(
+        max_digits=1000, decimal_places=1000, null=True
     )
-    revenue_code_concept: Concept = ForeignKey(
+    revenue_code_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="cost_revenue_code_concept_set",
-        blank=True,
         null=True,
     )
-    revenue_code_source_value: str = CharField(max_length=50, blank=True, null=True)
-    drg_concept: Concept = ForeignKey(
+    revenue_code_source_value: str | None = CharField(max_length=50, null=True)
+    drg_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="cost_drg_concept_set",
-        blank=True,
         null=True,
     )
-    drg_source_value: str = CharField(max_length=3, blank=True, null=True)
+    drg_source_value: str | None = CharField(max_length=3, null=True)
 
 
 class Death(Record, CanCurate, TracksRun, TracksUpdates):
@@ -357,23 +343,21 @@ class Death(Record, CanCurate, TracksRun, TracksUpdates):
 
     person: Person = ForeignKey("Person", models.DO_NOTHING)
     death_date: datetime = DateField()
-    death_datetime: datetime = DateTimeField(blank=True, null=True)
-    death_type_concept: Concept = ForeignKey(
-        Concept, models.DO_NOTHING, blank=True, null=True
+    death_datetime: datetime | None = DateTimeField(null=True)
+    death_type_concept: Concept | None = ForeignKey(
+        Concept, models.DO_NOTHING, null=True
     )
-    cause_concept: Concept = ForeignKey(
+    cause_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="death_cause_concept_set",
-        blank=True,
         null=True,
     )
-    cause_source_value: str = CharField(max_length=50, blank=True, null=True)
-    cause_source_concept: Concept = ForeignKey(
+    cause_source_value: str | None = CharField(max_length=50, null=True)
+    cause_source_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="death_cause_source_concept_set",
-        blank=True,
         null=True,
     )
 
@@ -393,47 +377,42 @@ class DeviceExposure(Record, CanCurate, TracksRun, TracksUpdates):
     person: Person = ForeignKey("Person", models.DO_NOTHING)
     device_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
     device_exposure_start_date: datetime = DateField()
-    device_exposure_start_datetime: datetime = DateTimeField(blank=True, null=True)
-    device_exposure_end_date: datetime = DateField(blank=True, null=True)
-    device_exposure_end_datetime: datetime = DateTimeField(blank=True, null=True)
+    device_exposure_start_datetime: datetime | None = DateTimeField(null=True)
+    device_exposure_end_date: datetime | None = DateField(null=True)
+    device_exposure_end_datetime: datetime | None = DateTimeField(null=True)
     device_type_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="deviceexposure_device_type_concept_set",
     )
-    unique_device_id: str = CharField(max_length=255, blank=True, null=True)
-    production_id: str = CharField(max_length=255, blank=True, null=True)
-    quantity: int = IntegerField(blank=True, null=True)
-    provider: Provider = ForeignKey(
-        "Provider", models.DO_NOTHING, blank=True, null=True
+    unique_device_id: str | None = CharField(null=True)
+    production_id: str | None = CharField(null=True)
+    quantity: int | None = IntegerField(null=True)
+    provider: Provider | None = ForeignKey("Provider", models.DO_NOTHING, null=True)
+    visit_occurrence: VisitOccurrence | None = ForeignKey(
+        "VisitOccurrence", models.DO_NOTHING, null=True
     )
-    visit_occurrence: VisitOccurrence = ForeignKey(
-        "VisitOccurrence", models.DO_NOTHING, blank=True, null=True
+    visit_detail: VisitDetail | None = ForeignKey(
+        "VisitDetail", models.DO_NOTHING, null=True
     )
-    visit_detail: VisitDetail = ForeignKey(
-        "VisitDetail", models.DO_NOTHING, blank=True, null=True
-    )
-    device_source_value: str = CharField(max_length=50, blank=True, null=True)
-    device_source_concept: Concept = ForeignKey(
+    device_source_value: str | None = CharField(max_length=50, null=True)
+    device_source_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="deviceexposure_device_source_concept_set",
-        blank=True,
         null=True,
     )
-    unit_concept: Concept = ForeignKey(
+    unit_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="deviceexposure_unit_concept_set",
-        blank=True,
         null=True,
     )
-    unit_source_value: str = CharField(max_length=50, blank=True, null=True)
-    unit_source_concept: Concept = ForeignKey(
+    unit_source_value: str | None = CharField(max_length=50, null=True)
+    unit_source_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="deviceexposure_unit_source_concept_set",
-        blank=True,
         null=True,
     )
 
@@ -484,8 +463,8 @@ class DrugEra(Record, CanCurate, TracksRun, TracksUpdates):
     drug_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
     drug_era_start_date: datetime = DateField()
     drug_era_end_date: datetime = DateField()
-    drug_exposure_count: int = IntegerField(blank=True, null=True)
-    gap_days: int = IntegerField(blank=True, null=True)
+    drug_exposure_count: int | None = IntegerField(null=True)
+    gap_days: int | None = IntegerField(null=True)
 
 
 class DrugExposure(Record, CanCurate, TracksRun, TracksUpdates):
@@ -503,47 +482,43 @@ class DrugExposure(Record, CanCurate, TracksRun, TracksUpdates):
     person: Person = ForeignKey("Person", models.DO_NOTHING)
     drug_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
     drug_exposure_start_date: datetime = DateField()
-    drug_exposure_start_datetime: datetime = DateTimeField(blank=True, null=True)
+    drug_exposure_start_datetime: datetime | None = DateTimeField(null=True)
     drug_exposure_end_date: datetime = DateField()
-    drug_exposure_end_datetime: datetime = DateTimeField(blank=True, null=True)
-    verbatim_end_date: datetime = DateField(blank=True, null=True)
+    drug_exposure_end_datetime: datetime | None = DateTimeField(null=True)
+    verbatim_end_date: datetime | None = DateField(null=True)
     drug_type_concept: Concept = ForeignKey(
         Concept, models.DO_NOTHING, related_name="drugexposure_drug_type_concept_set"
     )
-    stop_reason: str = CharField(max_length=20, blank=True, null=True)
-    refills: int = IntegerField(blank=True, null=True)
-    quantity: float = DecimalField(
-        max_digits=1000, decimal_places=1000, blank=True, null=True
+    stop_reason: str | None = CharField(max_length=20, null=True)
+    refills: int | None = IntegerField(null=True)
+    quantity: float | None = DecimalField(
+        max_digits=1000, decimal_places=1000, null=True
     )
-    days_supply: int = IntegerField(blank=True, null=True)
-    sig: str = TextField(blank=True, null=True)
-    route_concept: Concept = ForeignKey(
+    days_supply: int | None = IntegerField(null=True)
+    sig: str | None = TextField(null=True)
+    route_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="drugexposure_route_concept_set",
-        blank=True,
         null=True,
     )
-    lot_number: str = CharField(max_length=50, blank=True, null=True)
-    provider: Provider = ForeignKey(
-        "Provider", models.DO_NOTHING, blank=True, null=True
+    lot_number: str | None = CharField(max_length=50, null=True)
+    provider: Provider | None = ForeignKey("Provider", models.DO_NOTHING, null=True)
+    visit_occurrence: VisitOccurrence | None = ForeignKey(
+        "VisitOccurrence", models.DO_NOTHING, null=True
     )
-    visit_occurrence: VisitOccurrence = ForeignKey(
-        "VisitOccurrence", models.DO_NOTHING, blank=True, null=True
+    visit_detail: VisitDetail | None = ForeignKey(
+        "VisitDetail", models.DO_NOTHING, null=True
     )
-    visit_detail: VisitDetail = ForeignKey(
-        "VisitDetail", models.DO_NOTHING, blank=True, null=True
-    )
-    drug_source_value: str = CharField(max_length=50, blank=True, null=True)
-    drug_source_concept: Concept = ForeignKey(
+    drug_source_value: str | None = CharField(max_length=50, null=True)
+    drug_source_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="drugexposure_drug_source_concept_set",
-        blank=True,
         null=True,
     )
-    route_source_value: str = CharField(max_length=50, blank=True, null=True)
-    dose_unit_source_value: str = CharField(max_length=50, blank=True, null=True)
+    route_source_value: str | None = CharField(max_length=50, null=True)
+    dose_unit_source_value: str | None = CharField(max_length=50, null=True)
 
 
 class DrugStrength(Record, CanCurate, TracksRun, TracksUpdates):
@@ -559,40 +534,37 @@ class DrugStrength(Record, CanCurate, TracksRun, TracksUpdates):
     ingredient_concept: Concept = ForeignKey(
         Concept, models.DO_NOTHING, related_name="drugstrength_ingredient_concept_set"
     )
-    amount_value: float = DecimalField(
-        max_digits=1000, decimal_places=1000, blank=True, null=True
+    amount_value: float | None = DecimalField(
+        max_digits=1000, decimal_places=1000, null=True
     )
-    amount_unit_concept: Concept = ForeignKey(
+    amount_unit_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="drugstrength_amount_unit_concept_set",
-        blank=True,
         null=True,
     )
-    numerator_value: float = DecimalField(
-        max_digits=1000, decimal_places=1000, blank=True, null=True
+    numerator_value: float | None = DecimalField(
+        max_digits=1000, decimal_places=1000, null=True
     )
-    numerator_unit_concept: Concept = ForeignKey(
+    numerator_unit_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="drugstrength_numerator_unit_concept_set",
-        blank=True,
         null=True,
     )
-    denominator_value: float = DecimalField(
-        max_digits=1000, decimal_places=1000, blank=True, null=True
+    denominator_value: float | None = DecimalField(
+        max_digits=1000, decimal_places=1000, null=True
     )
-    denominator_unit_concept: Concept = ForeignKey(
+    denominator_unit_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="drugstrength_denominator_unit_concept_set",
-        blank=True,
         null=True,
     )
-    box_size: int = IntegerField(blank=True, null=True)
+    box_size: int | None = IntegerField(null=True)
     valid_start_date: datetime = DateField()
     valid_end_date: datetime = DateField()
-    invalid_reason: str = CharField(max_length=1, blank=True, null=True)
+    invalid_reason: str | None = CharField(max_length=1, null=True)
 
 
 class Episode(Record, CanCurate, TracksRun, TracksUpdates):
@@ -610,23 +582,22 @@ class Episode(Record, CanCurate, TracksRun, TracksUpdates):
     person: Person = ForeignKey("Person", models.DO_NOTHING)
     episode_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
     episode_start_date: datetime = DateField()
-    episode_start_datetime: datetime = DateTimeField(blank=True, null=True)
-    episode_end_date: datetime = DateField(blank=True, null=True)
-    episode_end_datetime: datetime = DateTimeField(blank=True, null=True)
-    episode_parent_id: int = IntegerField(blank=True, null=True)
-    episode_number: int = IntegerField(blank=True, null=True)
+    episode_start_datetime: datetime | None = DateTimeField(null=True)
+    episode_end_date: datetime | None = DateField(null=True)
+    episode_end_datetime: datetime | None = DateTimeField(null=True)
+    episode_parent_id: int | None = IntegerField(null=True)
+    episode_number: int | None = IntegerField(null=True)
     episode_object_concept: Concept = ForeignKey(
         Concept, models.DO_NOTHING, related_name="episode_episode_object_concept_set"
     )
     episode_type_concept: Concept = ForeignKey(
         Concept, models.DO_NOTHING, related_name="episode_episode_type_concept_set"
     )
-    episode_source_value: str = CharField(max_length=50, blank=True, null=True)
-    episode_source_concept: Concept = ForeignKey(
+    episode_source_value: str | None = CharField(max_length=50, null=True)
+    episode_source_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="episode_episode_source_concept_set",
-        blank=True,
         null=True,
     )
 
@@ -684,20 +655,20 @@ class Location(Record, CanCurate, TracksRun, TracksUpdates):
         abstract = False
 
     location_id: int = IntegerField(primary_key=True)
-    address_1: str = CharField(max_length=50, blank=True, null=True)
-    address_2: str = CharField(max_length=50, blank=True, null=True)
-    city: str = CharField(max_length=50, blank=True, null=True)
-    state: str = CharField(max_length=2, blank=True, null=True)
-    zip: str = CharField(max_length=9, blank=True, null=True)
-    county: str = CharField(max_length=20, blank=True, null=True)
-    location_source_value: str = CharField(max_length=50, blank=True, null=True)
-    country_concept: Concept = ForeignKey(
-        Concept, models.DO_NOTHING, blank=True, null=True
+    address_1: str | None = CharField(max_length=50, null=True)
+    address_2: str | None = CharField(max_length=50, null=True)
+    city: str | None = CharField(max_length=50, null=True)
+    state: str | None = CharField(max_length=2, null=True)
+    zip: str | None = CharField(max_length=9, null=True)
+    county: str | None = CharField(max_length=20, null=True)
+    location_source_value: str | None = CharField(max_length=50, null=True)
+    country_concept: Concept | None = ForeignKey(Concept, models.DO_NOTHING, null=True)
+    country_source_value: str | None = CharField(max_length=80, null=True)
+    latitude: Decimal | None = DecimalField(
+        max_digits=1000, decimal_places=1000, null=True
     )
-    country_source_value: str = CharField(max_length=80, blank=True, null=True)
-    latitude = DecimalField(max_digits=1000, decimal_places=1000, blank=True, null=True)
-    longitude: str = DecimalField(
-        max_digits=1000, decimal_places=1000, blank=True, null=True
+    longitude: str | None = DecimalField(
+        max_digits=1000, decimal_places=1000, null=True
     )
 
 
@@ -719,75 +690,67 @@ class Measurement(Record, CanCurate, TracksRun, TracksUpdates):
     person: Person = ForeignKey("Person", models.DO_NOTHING)
     measurement_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
     measurement_date: datetime = DateField()
-    measurement_datetime: datetime = DateTimeField(blank=True, null=True)
-    measurement_time: str = CharField(max_length=10, blank=True, null=True)
+    measurement_datetime: datetime | None = DateTimeField(null=True)
+    measurement_time: str | None = CharField(max_length=10, null=True)
     measurement_type_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="measurement_measurement_type_concept_set",
     )
-    operator_concept: Concept = ForeignKey(
+    operator_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="measurement_operator_concept_set",
-        blank=True,
         null=True,
     )
-    value_as_number: float = DecimalField(
-        max_digits=1000, decimal_places=1000, blank=True, null=True
+    value_as_number: float | None = DecimalField(
+        max_digits=1000, decimal_places=1000, null=True
     )
-    value_as_concept: Concept = ForeignKey(
+    value_as_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="measurement_value_as_concept_set",
-        blank=True,
         null=True,
     )
-    unit_concept: Concept = ForeignKey(
+    unit_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="measurement_unit_concept_set",
-        blank=True,
         null=True,
     )
-    range_low: float = DecimalField(
-        max_digits=1000, decimal_places=1000, blank=True, null=True
+    range_low: float | None = DecimalField(
+        max_digits=1000, decimal_places=1000, null=True
     )
-    range_high: float = DecimalField(
-        max_digits=1000, decimal_places=1000, blank=True, null=True
+    range_high: float | None = DecimalField(
+        max_digits=1000, decimal_places=1000, null=True
     )
-    provider: Provider = ForeignKey(
-        "Provider", models.DO_NOTHING, blank=True, null=True
+    provider: Provider | None = ForeignKey("Provider", models.DO_NOTHING, null=True)
+    visit_occurrence: VisitOccurrence | None = ForeignKey(
+        "VisitOccurrence", models.DO_NOTHING, null=True
     )
-    visit_occurrence = ForeignKey(
-        "VisitOccurrence", models.DO_NOTHING, blank=True, null=True
+    visit_detail: VisitDetail | None = ForeignKey(
+        "VisitDetail", models.DO_NOTHING, null=True
     )
-    visit_detail: VisitDetail = ForeignKey(
-        "VisitDetail", models.DO_NOTHING, blank=True, null=True
-    )
-    measurement_source_value: str = CharField(max_length=50, blank=True, null=True)
-    measurement_source_concept: Concept = ForeignKey(
+    measurement_source_value: str | None = CharField(max_length=50, null=True)
+    measurement_source_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="measurement_measurement_source_concept_set",
-        blank=True,
         null=True,
     )
-    unit_source_value: str = CharField(max_length=50, blank=True, null=True)
-    unit_source_concept: Concept = ForeignKey(
+    unit_source_value: str | None = CharField(max_length=50, null=True)
+    unit_source_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="measurement_unit_source_concept_set",
-        blank=True,
         null=True,
     )
-    value_source_value: str = CharField(max_length=50, blank=True, null=True)
-    measurement_event_id: int = IntegerField(blank=True, null=True)
-    meas_event_field_concept: Concept = ForeignKey(
+    value_source_value: str | None = CharField(max_length=50, null=True)
+    measurement_event_id: int | None = IntegerField(null=True)
+    meas_event_field_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="measurement_meas_event_field_concept_set",
-        blank=True,
         null=True,
     )
 
@@ -804,19 +767,18 @@ class Metadata(Record, CanCurate, TracksRun, TracksUpdates):
         Concept, models.DO_NOTHING, related_name="metadata_metadata_type_concept_set"
     )
     name: str = CharField(max_length=250)
-    value_as_string: str = CharField(max_length=250, blank=True, null=True)
-    value_as_concept: Concept = ForeignKey(
+    value_as_string: str | None = CharField(max_length=250, null=True)
+    value_as_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="metadata_value_as_concept_set",
-        blank=True,
         null=True,
     )
-    value_as_number: float = DecimalField(
-        max_digits=1000, decimal_places=1000, blank=True, null=True
+    value_as_number: float | None = DecimalField(
+        max_digits=1000, decimal_places=1000, null=True
     )
-    metadata_date: datetime = DateField(blank=True, null=True)
-    metadata_datetime: datetime = DateTimeField(blank=True, null=True)
+    metadata_date: datetime | None = DateField(null=True)
+    metadata_datetime: datetime | None = DateTimeField(null=True)
 
 
 class Note(Record, CanCurate, TracksRun, TracksUpdates):
@@ -828,12 +790,12 @@ class Note(Record, CanCurate, TracksRun, TracksUpdates):
     note_id: int = IntegerField(primary_key=True)
     person: Person = ForeignKey("Person", models.DO_NOTHING)
     note_date: datetime = DateField()
-    note_datetime: datetime = DateTimeField(blank=True, null=True)
+    note_datetime: datetime | None = DateTimeField(null=True)
     note_type_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
     note_class_concept: Concept = ForeignKey(
         Concept, models.DO_NOTHING, related_name="note_note_class_concept_set"
     )
-    note_title: str = CharField(max_length=250, blank=True, null=True)
+    note_title: str | None = CharField(max_length=250, null=True)
     note_text: str = TextField()
     encoding_concept: Concept = ForeignKey(
         Concept, models.DO_NOTHING, related_name="note_encoding_concept_set"
@@ -841,22 +803,19 @@ class Note(Record, CanCurate, TracksRun, TracksUpdates):
     language_concept: Concept = ForeignKey(
         Concept, models.DO_NOTHING, related_name="note_language_concept_set"
     )
-    provider: Provider = ForeignKey(
-        "Provider", models.DO_NOTHING, blank=True, null=True
+    provider: Provider | None = ForeignKey("Provider", models.DO_NOTHING, null=True)
+    visit_occurrence: VisitOccurrence | None = ForeignKey(
+        "VisitOccurrence", models.DO_NOTHING, null=True
     )
-    visit_occurrence: VisitOccurrence = ForeignKey(
-        "VisitOccurrence", models.DO_NOTHING, blank=True, null=True
+    visit_detail: VisitDetail | None = ForeignKey(
+        "VisitDetail", models.DO_NOTHING, null=True
     )
-    visit_detail: VisitDetail = ForeignKey(
-        "VisitDetail", models.DO_NOTHING, blank=True, null=True
-    )
-    note_source_value: str = CharField(max_length=50, blank=True, null=True)
-    note_event_id: int = IntegerField(blank=True, null=True)
-    note_event_field_concept: Concept = ForeignKey(
+    note_source_value: str | None = CharField(max_length=50, null=True)
+    note_event_id: int | None = IntegerField(null=True)
+    note_event_field_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="note_note_event_field_concept_set",
-        blank=True,
         null=True,
     )
 
@@ -869,32 +828,28 @@ class NoteNlp(Record, CanCurate, TracksRun, TracksUpdates):
 
     note_nlp_id: int = IntegerField(primary_key=True)
     note_id: int = IntegerField()
-    section_concept: Concept = ForeignKey(
-        Concept, models.DO_NOTHING, blank=True, null=True
-    )
-    snippet: str = CharField(max_length=250, blank=True, null=True)
-    offset: str = CharField(max_length=50, blank=True, null=True)
+    section_concept: Concept | None = ForeignKey(Concept, models.DO_NOTHING, null=True)
+    snippet: str | None = CharField(max_length=250, null=True)
+    offset: str | None = CharField(max_length=50, null=True)
     lexical_variant: str = CharField(max_length=250)
-    note_nlp_concept: Concept = ForeignKey(
+    note_nlp_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="notenlp_note_nlp_concept_set",
-        blank=True,
         null=True,
     )
-    note_nlp_source_concept: Concept = ForeignKey(
+    note_nlp_source_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="notenlp_note_nlp_source_concept_set",
-        blank=True,
         null=True,
     )
-    nlp_system: str = CharField(max_length=250, blank=True, null=True)
+    nlp_system: str | None = CharField(max_length=250, null=True)
     nlp_date: datetime = DateField()
-    nlp_datetime: datetime = DateTimeField(blank=True, null=True)
-    term_exists: str = CharField(max_length=1, blank=True, null=True)
-    term_temporal: str = CharField(max_length=50, blank=True, null=True)
-    term_modifiers: str = CharField(max_length=2000, blank=True, null=True)
+    nlp_datetime: datetime | None = DateTimeField(null=True)
+    term_exists: str | None = CharField(max_length=1, null=True)
+    term_temporal: str | None = CharField(max_length=50, null=True)
+    term_modifiers: str | None = CharField(max_length=2000, null=True)
 
 
 class Observation(Record, CanCurate, TracksRun, TracksUpdates):
@@ -910,63 +865,56 @@ class Observation(Record, CanCurate, TracksRun, TracksUpdates):
     person: Person = ForeignKey("Person", models.DO_NOTHING)
     observation_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
     observation_date: datetime = DateField()
-    observation_datetime: datetime = DateTimeField(blank=True, null=True)
+    observation_datetime: datetime | None = DateTimeField(null=True)
     observation_type_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="observation_observation_type_concept_set",
     )
-    value_as_number: float = DecimalField(
-        max_digits=1000, decimal_places=1000, blank=True, null=True
+    value_as_number: float | None = DecimalField(
+        max_digits=1000, decimal_places=1000, null=True
     )
-    value_as_string: str = CharField(max_length=60, blank=True, null=True)
-    value_as_concept: Concept = ForeignKey(
+    value_as_string: str | None = CharField(max_length=60, null=True)
+    value_as_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="observation_value_as_concept_set",
-        blank=True,
         null=True,
     )
-    qualifier_concept: Concept = ForeignKey(
+    qualifier_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="observation_qualifier_concept_set",
-        blank=True,
         null=True,
     )
-    unit_concept: Concept = ForeignKey(
+    unit_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="observation_unit_concept_set",
-        blank=True,
         null=True,
     )
-    provider: Provider = ForeignKey(
-        "Provider", models.DO_NOTHING, blank=True, null=True
+    provider: Provider | None = ForeignKey("Provider", models.DO_NOTHING, null=True)
+    visit_occurrence: VisitOccurrence | None = ForeignKey(
+        "VisitOccurrence", models.DO_NOTHING, null=True
     )
-    visit_occurrence: VisitOccurrence = ForeignKey(
-        "VisitOccurrence", models.DO_NOTHING, blank=True, null=True
+    visit_detail: VisitDetail | None = ForeignKey(
+        "VisitDetail", models.DO_NOTHING, null=True
     )
-    visit_detail: VisitDetail = ForeignKey(
-        "VisitDetail", models.DO_NOTHING, blank=True, null=True
-    )
-    observation_source_value: str = CharField(max_length=50, blank=True, null=True)
-    observation_source_concept: Concept = ForeignKey(
+    observation_source_value: str | None = CharField(max_length=50, null=True)
+    observation_source_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="observation_observation_source_concept_set",
-        blank=True,
         null=True,
     )
-    unit_source_value: str = CharField(max_length=50, blank=True, null=True)
-    qualifier_source_value: str = CharField(max_length=50, blank=True, null=True)
-    value_source_value: str = CharField(max_length=50, blank=True, null=True)
-    observation_event_id: int = IntegerField(blank=True, null=True)
-    obs_event_field_concept: Concept = ForeignKey(
+    unit_source_value: str | None = CharField(max_length=50, null=True)
+    qualifier_source_value: str | None = CharField(max_length=50, null=True)
+    value_source_value: str | None = CharField(max_length=50, null=True)
+    observation_event_id: int | None = IntegerField(null=True)
+    obs_event_field_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="observation_obs_event_field_concept_set",
-        blank=True,
         null=True,
     )
 
@@ -1004,61 +952,52 @@ class PayerPlanPeriod(Record, CanCurate, TracksRun, TracksUpdates):
     person: Person = ForeignKey("Person", models.DO_NOTHING)
     payer_plan_period_start_date: datetime = DateField()
     payer_plan_period_end_date: datetime = DateField()
-    payer_concept: Concept = ForeignKey(
-        Concept, models.DO_NOTHING, blank=True, null=True
-    )
-    payer_source_value: str = CharField(max_length=50, blank=True, null=True)
-    payer_source_concept: Concept = ForeignKey(
+    payer_concept: Concept | None = ForeignKey(Concept, models.DO_NOTHING, null=True)
+    payer_source_value: str | None = CharField(max_length=50, null=True)
+    payer_source_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="payerplanperiod_payer_source_concept_set",
-        blank=True,
         null=True,
     )
-    plan_concept: Concept = ForeignKey(
+    plan_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="payerplanperiod_plan_concept_set",
-        blank=True,
         null=True,
     )
-    plan_source_value: str = CharField(max_length=50, blank=True, null=True)
-    plan_source_concept: Concept = ForeignKey(
+    plan_source_value: str | None = CharField(max_length=50, null=True)
+    plan_source_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="payerplanperiod_plan_source_concept_set",
-        blank=True,
         null=True,
     )
-    sponsor_concept: Concept = ForeignKey(
+    sponsor_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="payerplanperiod_sponsor_concept_set",
-        blank=True,
         null=True,
     )
-    sponsor_source_value: str = CharField(max_length=50, blank=True, null=True)
-    sponsor_source_concept: Concept = ForeignKey(
+    sponsor_source_value: str | None = CharField(max_length=50, null=True)
+    sponsor_source_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="payerplanperiod_sponsor_source_concept_set",
-        blank=True,
         null=True,
     )
-    family_source_value: str = CharField(max_length=50, blank=True, null=True)
+    family_source_value: str | None = CharField(max_length=50, null=True)
     stop_reason_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="payerplanperiod_stop_reason_concept_set",
-        blank=True,
         null=True,
     )
-    stop_reason_source_value: str = CharField(max_length=50, blank=True, null=True)
-    stop_reason_source_concept: Concept = ForeignKey(
+    stop_reason_source_value: str | None = CharField(max_length=50, null=True)
+    stop_reason_source_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="payerplanperiod_stop_reason_source_concept_set",
-        blank=True,
         null=True,
     )
 
@@ -1075,43 +1014,38 @@ class Person(Record, CanCurate, TracksRun, TracksUpdates):
     person_id: int = IntegerField(primary_key=True)
     gender_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
     year_of_birth: int = IntegerField()
-    month_of_birth: int = IntegerField(blank=True, null=True)
-    day_of_birth: int = IntegerField(blank=True, null=True)
-    birth_datetime: datetime = DateTimeField(blank=True, null=True)
+    month_of_birth: int | None = IntegerField(null=True)
+    day_of_birth: int | None = IntegerField(null=True)
+    birth_datetime: datetime | None = DateTimeField(null=True)
     race_concept: Concept = ForeignKey(
         Concept, models.DO_NOTHING, related_name="person_race_concept_set"
     )
     ethnicity_concept: Concept = ForeignKey(
         Concept, models.DO_NOTHING, related_name="person_ethnicity_concept_set"
     )
-    location: Location = ForeignKey(Location, models.DO_NOTHING, blank=True, null=True)
-    provider: Provider = ForeignKey(
-        "Provider", models.DO_NOTHING, blank=True, null=True
-    )
-    care_site: CareSite = ForeignKey(CareSite, models.DO_NOTHING, blank=True, null=True)
-    person_source_value: str = CharField(max_length=50, blank=True, null=True)
-    gender_source_value: str = CharField(max_length=50, blank=True, null=True)
-    gender_source_concept: Concept = ForeignKey(
+    location: Location | None = ForeignKey(Location, models.DO_NOTHING, null=True)
+    provider: Provider | None = ForeignKey("Provider", models.DO_NOTHING, null=True)
+    care_site: CareSite | None = ForeignKey(CareSite, models.DO_NOTHING, null=True)
+    person_source_value: str | None = CharField(max_length=50, null=True)
+    gender_source_value: str | None = CharField(max_length=50, null=True)
+    gender_source_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="person_gender_source_concept_set",
-        blank=True,
         null=True,
     )
-    race_source_value: str = CharField(max_length=50, blank=True, null=True)
-    race_source_concept: Concept = ForeignKey(
+    race_source_value: str | None = CharField(max_length=50, null=True)
+    race_source_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="person_race_source_concept_set",
-        blank=True,
         null=True,
     )
-    ethnicity_source_value: str = CharField(max_length=50, blank=True, null=True)
-    ethnicity_source_concept: Concept = ForeignKey(
+    ethnicity_source_value: str | None = CharField(max_length=50, null=True)
+    ethnicity_source_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="person_ethnicity_source_concept_set",
-        blank=True,
         null=True,
     )
 
@@ -1126,40 +1060,36 @@ class ProcedureOccurrence(Record, CanCurate, TracksRun, TracksUpdates):
     person: Person = ForeignKey(Person, models.DO_NOTHING)
     procedure_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
     procedure_date: datetime = DateField()
-    procedure_datetime: datetime = DateTimeField(blank=True, null=True)
-    procedure_end_date: datetime = DateField(blank=True, null=True)
-    procedure_end_datetime: datetime = DateTimeField(blank=True, null=True)
+    procedure_datetime: datetime | None = DateTimeField(null=True)
+    procedure_end_date: datetime | None = DateField(null=True)
+    procedure_end_datetime: datetime | None = DateTimeField(null=True)
     procedure_type_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="procedureoccurrence_procedure_type_concept_set",
     )
-    modifier_concept: Concept = ForeignKey(
+    modifier_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="procedureoccurrence_modifier_concept_set",
-        blank=True,
         null=True,
     )
-    quantity: int = IntegerField(blank=True, null=True)
-    provider: Provider = ForeignKey(
-        "Provider", models.DO_NOTHING, blank=True, null=True
+    quantity: int | None = IntegerField(null=True)
+    provider: Provider | None = ForeignKey("Provider", models.DO_NOTHING, null=True)
+    visit_occurrence: VisitOccurrence | None = ForeignKey(
+        "VisitOccurrence", models.DO_NOTHING, null=True
     )
-    visit_occurrence: VisitOccurrence = ForeignKey(
-        "VisitOccurrence", models.DO_NOTHING, blank=True, null=True
+    visit_detail: VisitDetail | None = ForeignKey(
+        "VisitDetail", models.DO_NOTHING, null=True
     )
-    visit_detail: VisitDetail = ForeignKey(
-        "VisitDetail", models.DO_NOTHING, blank=True, null=True
-    )
-    procedure_source_value: str = CharField(max_length=50, blank=True, null=True)
-    procedure_source_concept: Concept = ForeignKey(
+    procedure_source_value: str | None = CharField(max_length=50, null=True)
+    procedure_source_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="procedureoccurrence_procedure_source_concept_set",
-        blank=True,
         null=True,
     )
-    modifier_source_value: str = CharField(max_length=50, blank=True, null=True)
+    modifier_source_value: str | None = CharField(max_length=50, null=True)
 
 
 class Provider(Record, CanCurate, TracksRun, TracksUpdates):
@@ -1172,36 +1102,33 @@ class Provider(Record, CanCurate, TracksRun, TracksUpdates):
         abstract = False
 
     provider_id: int = IntegerField(primary_key=True)
-    provider_name: str = CharField(max_length=255, blank=True, null=True)
-    npi: str = CharField(max_length=20, blank=True, null=True)
-    dea: str = CharField(max_length=20, blank=True, null=True)
-    specialty_concept: Concept = ForeignKey(
-        Concept, models.DO_NOTHING, blank=True, null=True
+    provider_name: str | None = CharField(max_length=255, null=True)
+    npi: str | None = CharField(max_length=20, null=True)
+    dea: str | None = CharField(max_length=20, null=True)
+    specialty_concept: Concept | None = ForeignKey(
+        Concept, models.DO_NOTHING, null=True
     )
-    care_site: CareSite = ForeignKey(CareSite, models.DO_NOTHING, blank=True, null=True)
-    year_of_birth: int = IntegerField(blank=True, null=True)
-    gender_concept: Concept = ForeignKey(
+    care_site: CareSite | None = ForeignKey(CareSite, models.DO_NOTHING, null=True)
+    year_of_birth: int | None = IntegerField(null=True)
+    gender_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="provider_gender_concept_set",
-        blank=True,
         null=True,
     )
-    provider_source_value: str = CharField(max_length=50, blank=True, null=True)
-    specialty_source_value: str = CharField(max_length=50, blank=True, null=True)
-    specialty_source_concept: Concept = ForeignKey(
+    provider_source_value: str | None = CharField(max_length=50, null=True)
+    specialty_source_value: str | None = CharField(max_length=50, null=True)
+    specialty_source_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="provider_specialty_source_concept_set",
-        blank=True,
         null=True,
     )
-    gender_source_value: str = CharField(max_length=50, blank=True, null=True)
-    gender_source_concept: Concept = ForeignKey(
+    gender_source_value: str | None = CharField(max_length=50, null=True)
+    gender_source_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="provider_gender_source_concept_set",
-        blank=True,
         null=True,
     )
 
@@ -1234,14 +1161,14 @@ class SourceToConceptMap(Record, CanCurate, TracksRun, TracksUpdates):
     source_code: str = CharField(max_length=50)
     source_concept: str = ForeignKey(Concept, models.DO_NOTHING)
     source_vocabulary_id: str = CharField(max_length=20)
-    source_code_description: str = CharField(max_length=255, blank=True, null=True)
+    source_code_description: str | None = CharField(max_length=255, null=True)
     target_concept: Concept = ForeignKey(
         Concept, models.DO_NOTHING, related_name="sourcetoconceptmap_target_concept_set"
     )
     target_vocabulary: Vocabulary = ForeignKey("Vocabulary", models.DO_NOTHING)
     valid_start_date: datetime = DateField()
     valid_end_date: datetime = DateField()
-    invalid_reason: str = CharField(max_length=1, blank=True, null=True)
+    invalid_reason: str | None = CharField(max_length=1, null=True)
 
 
 class Specimen(Record, CanCurate, TracksRun, TracksUpdates):
@@ -1257,36 +1184,33 @@ class Specimen(Record, CanCurate, TracksRun, TracksUpdates):
         Concept, models.DO_NOTHING, related_name="specimen_specimen_type_concept_set"
     )
     specimen_date: datetime = DateField()
-    specimen_datetime: datetime = DateTimeField(blank=True, null=True)
-    quantity: float = DecimalField(
-        max_digits=1000, decimal_places=1000, blank=True, null=True
+    specimen_datetime: datetime | None = DateTimeField(null=True)
+    quantity: float | None = DecimalField(
+        max_digits=1000, decimal_places=1000, null=True
     )
-    unit_concept: Concept = ForeignKey(
+    unit_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="specimen_unit_concept_set",
-        blank=True,
         null=True,
     )
-    anatomic_site_concept: Concept = ForeignKey(
+    anatomic_site_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="specimen_anatomic_site_concept_set",
-        blank=True,
         null=True,
     )
-    disease_status_concept: Concept = ForeignKey(
+    disease_status_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="specimen_disease_status_concept_set",
-        blank=True,
         null=True,
     )
-    specimen_source_id: str = CharField(max_length=50, blank=True, null=True)
-    specimen_source_value: str = CharField(max_length=50, blank=True, null=True)
-    unit_source_value: str = CharField(max_length=50, blank=True, null=True)
-    anatomic_site_source_value: str = CharField(max_length=50, blank=True, null=True)
-    disease_status_source_value: str = CharField(max_length=50, blank=True, null=True)
+    specimen_source_id: str | None = CharField(max_length=50, null=True)
+    specimen_source_value: str | None = CharField(max_length=50, null=True)
+    unit_source_value: str | None = CharField(max_length=50, null=True)
+    anatomic_site_source_value: str | None = CharField(max_length=50, null=True)
+    disease_status_source_value: str | None = CharField(max_length=50, null=True)
 
 
 class VisitDetail(Record, CanCurate, TracksRun, TracksUpdates):
@@ -1304,48 +1228,44 @@ class VisitDetail(Record, CanCurate, TracksRun, TracksUpdates):
     person: Person = ForeignKey(Person, models.DO_NOTHING)
     visit_detail_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
     visit_detail_start_date: datetime = DateField()
-    visit_detail_start_datetime: datetime = DateTimeField(blank=True, null=True)
+    visit_detail_start_datetime: datetime | None = DateTimeField(null=True)
     visit_detail_end_date: datetime = DateField()
-    visit_detail_end_datetime: datetime = DateTimeField(blank=True, null=True)
+    visit_detail_end_datetime: datetime | None = DateTimeField(null=True)
     visit_detail_type_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="visitdetail_visit_detail_type_concept_set",
     )
-    provider: Provider = ForeignKey(Provider, models.DO_NOTHING, blank=True, null=True)
-    care_site: CareSite = ForeignKey(CareSite, models.DO_NOTHING, blank=True, null=True)
-    visit_detail_source_value: str = CharField(max_length=50, blank=True, null=True)
-    visit_detail_source_concept: Concept = ForeignKey(
+    provider: Provider | None = ForeignKey(Provider, models.DO_NOTHING, null=True)
+    care_site: CareSite | None = ForeignKey(CareSite, models.DO_NOTHING, null=True)
+    visit_detail_source_value: str | None = CharField(max_length=50, null=True)
+    visit_detail_source_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="visitdetail_visit_detail_source_concept_set",
-        blank=True,
         null=True,
     )
-    admitted_from_concept: Concept = ForeignKey(
+    admitted_from_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="visitdetail_admitted_from_concept_set",
-        blank=True,
         null=True,
     )
-    admitted_from_source_value: str = CharField(max_length=50, blank=True, null=True)
-    discharged_to_source_value: str = CharField(max_length=50, blank=True, null=True)
-    discharged_to_concept: Concept = ForeignKey(
+    admitted_from_source_value: str | None = CharField(max_length=50, null=True)
+    discharged_to_source_value: str | None = CharField(max_length=50, null=True)
+    discharged_to_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="visitdetail_discharged_to_concept_set",
-        blank=True,
         null=True,
     )
-    preceding_visit_detail: VisitDetail = ForeignKey(
-        "self", models.DO_NOTHING, blank=True, null=True
+    preceding_visit_detail: VisitDetail | None = ForeignKey(
+        "self", models.DO_NOTHING, null=True
     )
-    parent_visit_detail: VisitDetail = ForeignKey(
+    parent_visit_detail: VisitDetail | None = ForeignKey(
         "self",
         models.DO_NOTHING,
         related_name="visitdetail_parent_visit_detail_set",
-        blank=True,
         null=True,
     )
     visit_occurrence: VisitOccurrence = ForeignKey("VisitOccurrence", models.DO_NOTHING)
@@ -1367,42 +1287,39 @@ class VisitOccurrence(Record, CanCurate, TracksRun, TracksUpdates):
     person: Person = ForeignKey(Person, models.DO_NOTHING)
     visit_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
     visit_start_date: datetime = DateField()
-    visit_start_datetime: datetime = DateTimeField(blank=True, null=True)
+    visit_start_datetime: datetime | None = DateTimeField(null=True)
     visit_end_date: datetime = DateField()
-    visit_end_datetime: datetime = DateTimeField(blank=True, null=True)
+    visit_end_datetime: datetime | None = DateTimeField(null=True)
     visit_type_concept: Concept = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="visitoccurrence_visit_type_concept_set",
     )
-    provider: Provider = ForeignKey(Provider, models.DO_NOTHING, blank=True, null=True)
-    care_site: CareSite = ForeignKey(CareSite, models.DO_NOTHING, blank=True, null=True)
-    visit_source_value: str = CharField(max_length=50, blank=True, null=True)
-    visit_source_concept: Concept = ForeignKey(
+    provider: Provider | None = ForeignKey(Provider, models.DO_NOTHING, null=True)
+    care_site: CareSite | None = ForeignKey(CareSite, models.DO_NOTHING, null=True)
+    visit_source_value: str | None = CharField(max_length=50, null=True)
+    visit_source_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="visitoccurrence_visit_source_concept_set",
-        blank=True,
         null=True,
     )
-    admitted_from_concept: Concept = ForeignKey(
+    admitted_from_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="visitoccurrence_admitted_from_concept_set",
-        blank=True,
         null=True,
     )
-    admitted_from_source_value: str = CharField(max_length=50, blank=True, null=True)
-    discharged_to_concept: Concept = ForeignKey(
+    admitted_from_source_value: str | None = CharField(max_length=50, null=True)
+    discharged_to_concept: Concept | None = ForeignKey(
         Concept,
         models.DO_NOTHING,
         related_name="visitoccurrence_discharged_to_concept_set",
-        blank=True,
         null=True,
     )
-    discharged_to_source_value: str = CharField(max_length=50, blank=True, null=True)
-    preceding_visit_occurrence: VisitOccurrence = ForeignKey(
-        "self", models.DO_NOTHING, blank=True, null=True
+    discharged_to_source_value: str | None = CharField(max_length=50, null=True)
+    preceding_visit_occurrence: VisitOccurrence | None = ForeignKey(
+        "self", models.DO_NOTHING, null=True
     )
 
 
@@ -1417,6 +1334,6 @@ class Vocabulary(Record, CanCurate, TracksRun, TracksUpdates):
 
     vocabulary_id: str = CharField(primary_key=True, max_length=20)
     vocabulary_name: str = CharField(max_length=255)
-    vocabulary_reference: str = CharField(max_length=255, blank=True, null=True)
-    vocabulary_version: str = CharField(max_length=255, blank=True, null=True)
+    vocabulary_reference: str | None = CharField(max_length=255, null=True)
+    vocabulary_version: str | None = CharField(max_length=255, null=True)
     vocabulary_concept: Concept = ForeignKey(Concept, models.DO_NOTHING)
