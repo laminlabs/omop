@@ -15,7 +15,7 @@ def lint(session: nox.Session) -> None:
 
 @nox.session()
 def build(session):
-    install_lamindb(session, branch="main")
+    install_lamindb(session, branch="release")
     session.run(*"uv pip install --system .[dev]".split())
     run_pytest(session)
     build_docs(session, strict=True)
