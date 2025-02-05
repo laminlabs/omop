@@ -178,7 +178,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="caresite",
             name="created_at",
-            field=lamindb.fields.DateTimeField(
+            field=lamindb.base.fields.DateTimeField(
                 auto_now_add=True, db_index=True, default=django.utils.timezone.now
             ),
             preserve_default=False,
