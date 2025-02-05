@@ -3,8 +3,8 @@
 import django.db.models.deletion
 import django.utils.timezone
 import lamindb.base.fields
-import lamindb.models
 import lamindb.base.users
+import lamindb.models
 from django.db import migrations, models
 
 
@@ -4497,16 +4497,12 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="relationship",
             name="defines_ancestry",
-            field=lamindb.base.fields.CharField(
-                blank=True, default=None, max_length=1
-            ),
+            field=lamindb.base.fields.CharField(blank=True, default=None, max_length=1),
         ),
         migrations.AlterField(
             model_name="relationship",
             name="is_hierarchical",
-            field=lamindb.base.fields.CharField(
-                blank=True, default=None, max_length=1
-            ),
+            field=lamindb.base.fields.CharField(blank=True, default=None, max_length=1),
         ),
         migrations.AlterField(
             model_name="relationship",

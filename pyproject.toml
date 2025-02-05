@@ -112,6 +112,8 @@ lint.ignore = [
     "E402",
     # open()` should be replaced by `Path.open()
     "PTH123",
+    # Using `.strip()` with multi-character strings is misleading
+    "B005"
 ]
 
 [tool.ruff.lint.pydocstyle]
