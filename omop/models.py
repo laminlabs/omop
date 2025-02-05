@@ -4,7 +4,7 @@ from datetime import datetime  # noqa
 from decimal import Decimal  # noqa
 
 from django.db import models
-from lnschema_core.fields import (
+from lamindb.base.fields import (
     CharField,
     DateField,
     DateTimeField,
@@ -13,7 +13,7 @@ from lnschema_core.fields import (
     IntegerField,
     TextField,
 )
-from lnschema_core.models import CanCurate, Record, TracksRun, TracksUpdates
+from lamindb.models import CanCurate, Record, TracksRun, TracksUpdates
 
 
 class CareSite(Record, CanCurate, TracksRun, TracksUpdates):
