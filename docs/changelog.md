@@ -3,6 +3,7 @@
 <!-- prettier-ignore -->
 Name | PR | Developer | Date | Version
 --- | --- | --- | --- | ---
+💚 Remove references to deleted migrations | [14](https://github.com/laminlabs/omop/pull/14) | [falexwolf](https://github.com/falexwolf) | 2025-02-16 |
 ⬆️ Lamindb v1 | [12](https://github.com/laminlabs/omop/pull/12) | [Zethson](https://github.com/Zethson) | 2025-02-05 |
 ♻️ Clean up | [10](https://github.com/laminlabs/omop/pull/10) | [sunnyosun](https://github.com/sunnyosun) | 2024-11-21 |
 🎨 Set blank=True | [9](https://github.com/laminlabs/omop/pull/9) | [sunnyosun](https://github.com/sunnyosun) | 2024-11-17 |
