@@ -9,7 +9,6 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("lamindb", "0081_revert_textfield_collection"),
         ("omop", "0002_alter_caresite_options_alter_cdmsource_options_and_more"),
     ]
 

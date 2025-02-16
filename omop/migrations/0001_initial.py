@@ -7,7 +7,9 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
     initial = True
 
-    dependencies: list = []
+    dependencies: list = [
+        ("lamindb", "0081_revert_textfield_collection"),
+    ]
 
     operations = [
         migrations.CreateModel(

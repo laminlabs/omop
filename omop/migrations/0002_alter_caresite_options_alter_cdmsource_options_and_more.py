@@ -10,10 +10,6 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        (
-            "lamindb",
-            "0069_alter_artifact__accessor_alter_artifact__hash_type_and_more",
-        ),
         ("omop", "0001_initial"),
     ]
 
